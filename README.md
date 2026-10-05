@@ -1,59 +1,48 @@
-# PortfolioJoanna
+# Joanna Sakugawa — Game Developer Portfolio
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.1.
+Personal portfolio built with Angular, TypeScript, and Tailwind CSS. The site is available in English and Spanish and features game development projects, professional experience, skills, education, and contact links.
 
-## Development server
+## Requirements
 
-To start a local development server, run:
+- Node.js 22.12+ or 24
+- npm 11
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Run locally
 
 ```bash
-ng generate component component-name
+npm ci
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open the local URL printed by Angular CLI (usually `http://localhost:4200/`).
+
+## Check and build
 
 ```bash
-ng generate --help
+npm test -- --watch=false
+npm run build
 ```
 
-## Building
+The production build is written to `dist/portfolio-joanna/browser`.
 
-To build the project run:
+## Deploy to GitHub
+
+Create an empty repository on GitHub, then connect this local repository and push the `main` branch:
 
 ```bash
-ng build
+git add .
+git commit -m "Prepare portfolio for deployment"
+git remote add origin https://github.com/USERNAME/REPOSITORY.git
+git push -u origin main
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Replace `USERNAME/REPOSITORY` with the GitHub repository URL. Do not commit `node_modules`, build output, local environment files, or Vercel's local project settings; they are excluded by `.gitignore`.
 
-## Running unit tests
+## Deploy to Vercel
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+1. In Vercel, choose **Add New → Project** and import the GitHub repository.
+2. Keep the Angular project root at the repository root.
+3. Use `npm run build` as the build command and `dist/portfolio-joanna/browser` as the output directory. These values are also set in `vercel.json`.
+4. Deploy. No environment variables are required.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Vercel will create deployments from pushes to GitHub and use the SPA rewrite in `vercel.json` for direct URL requests.
