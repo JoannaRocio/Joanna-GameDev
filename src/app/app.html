@@ -1,158 +1,270 @@
-<div class="portfolio-shell" [attr.lang]="language()">
-  <header class="topbar">
-    <a class="brand" href="#" (click)="selectTab('inicio'); $event.preventDefault()" [attr.aria-label]="copy().tabs[0].label">
-      <span class="brand-mark">JS</span>
-      <span>JOANNA SAKUGAWA</span>
+@let c = copy();
+<a class="skip-link" href="#main">{{ c.skipLink }}</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top" (click)="closeMenu()">
+      <span class="brand-mark" aria-hidden="true">JS</span>
+      <span class="brand-name">Joanna Sakugawa</span>
     </a>
-    <div class="header-tools">
-      <span class="header-role">{{ copy().headerRole }}</span>
-      <div class="language-switch" role="group" [attr.aria-label]="language() === 'en' ? 'Select language' : 'Seleccionar idioma'">
-        <button type="button" [attr.aria-pressed]="language() === 'en'" [class.language-active]="language() === 'en'" (click)="setLanguage('en')">EN</button>
-        <button type="button" [attr.aria-pressed]="language() === 'es'" [class.language-active]="language() === 'es'" (click)="setLanguage('es')">ES</button>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="site-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="menu-bars" aria-hidden="true"></span>
+      <span class="sr-only">{{ c.menu }}</span>
+    </button>
+
+    <nav id="site-nav" class="site-nav" [class.open]="menuOpen()" [attr.aria-label]="c.menu">
+      <ul>
+        @for (id of sections; track id) {
+          <li>
+            <a [href]="'#' + id" [class.active]="activeSection() === id" [attr.aria-current]="activeSection() === id ? 'true' : null" (click)="closeMenu()">{{ c.nav[id] }}</a>
+          </li>
+        }
+      </ul>
+      <div class="lang-switch" role="group" [attr.aria-label]="c.langLabel">
+        @for (l of langs; track l.id) {
+          <button type="button" [attr.lang]="l.id" [attr.title]="l.name" [attr.aria-pressed]="language() === l.id" (click)="setLanguage(l.id)">
+            {{ l.label }}
+          </button>
+        }
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HERO -->
+  <section id="top" class="hero">
+    <div class="sky" aria-hidden="true">
+      <span class="cloud cloud-1"></span><span class="cloud cloud-2"></span><span class="cloud cloud-3"></span>
+      <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span>
+    </div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">{{ c.hero.eyebrow }}</p>
+        <h1>Joanna Rocío <span class="accent">Sakugawa</span></h1>
+        <p class="hero-role">{{ c.hero.role }}</p>
+        <p class="hero-intro">{{ c.hero.intro }}</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#games">{{ c.hero.ctaGames }}</a>
+          <a class="btn btn-ghost" [href]="cvHref()" download>{{ c.hero.ctaCv }} <span aria-hidden="true">↓</span></a>
+        </div>
+        <dl class="hud">
+          @for (s of c.hero.stats; track s.label) {
+            <div><dt>{{ s.label }}</dt><dd>{{ s.value }}</dd></div>
+          }
+        </dl>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="screen screen-back"><img src="/images/memos-island.png" alt="" width="898" height="492" /></div>
+        <div class="screen screen-mid"><img src="/images/fishing-fish.png" alt="" width="1365" height="768" /></div>
+        <div class="screen screen-front">
+          <img [src]="rapha.image" alt="" [width]="rapha.width" [height]="rapha.height" />
+          <span class="press-start">{{ c.hero.pressStart }}</span>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <nav class="tabbar" [attr.aria-label]="copy().navigationLabel">
-    @for (tab of copy().tabs; track tab.id) {
-      <button
-        class="tab"
-        type="button"
-        [class.tab-active]="activeTab() === tab.id"
-        [attr.aria-pressed]="activeTab() === tab.id"
-        (click)="selectTab(tab.id)"
-      >
-        <span aria-hidden="true">{{ tab.icon }}</span>{{ tab.label }}
-      </button>
-    }
-  </nav>
-
-  <main class="workspace">
-    @switch (activeTab()) {
-      @case ('inicio') {
-        <section class="view home-view" aria-labelledby="home-title">
-          <div class="home-copy">
-            <p class="eyebrow">{{ copy().playerProfile }}</p>
-            <h1 id="home-title" aria-label="Joanna Rocío Sakugawa">Joanna Rocío<br />Sakugawa</h1>
-            <p class="home-role">{{ copy().roles }}</p>
-            <p class="home-intro">{{ copy().introduction }}</p>
-            <div class="home-study">
-                <span class="study-label">{{ copy().newMission }}</span>
-                <strong>{{ copy().degree }}</strong>
-                <span>{{ copy().university }}</span>
-            </div>
-          </div>
-          <div class="player-card" [attr.aria-label]="copy().playerCard">
-            <div class="player-card-top"><span>PLAYER 01</span><span>● ONLINE</span></div>
-            <div class="player-avatar" aria-hidden="true">
-              <span class="avatar-head"></span>
-              <span class="avatar-body"></span>
-              <span class="avatar-glasses"></span>
-              <span class="avatar-headset"></span>
-            </div>
-            <strong class="player-class">GAME DEVELOPER</strong>
-            <div class="player-divider"></div>
-            <div class="player-stats"><span>{{ copy().webExperience }}</span><strong>{{ copy().years }}</strong></div>
-            <div class="player-stats"><span>{{ copy().gameEngine }}</span><strong>UNITY · C#</strong></div>
-            <div class="player-hud"><span>{{ copy().questProgress }}</span><span><i></i><i></i><i></i><i></i><i></i></span></div>
-          </div>
-        </section>
-      }
-      @case ('juegos') {
-        <section class="view content-view games-view" aria-labelledby="games-title">
-          <header class="section-heading">
-            <div><p class="eyebrow">{{ copy().projectsEyebrow }}</p><h1 id="games-title">{{ copy().gamesTitle }}</h1></div>
-            <span class="section-count">{{ copy().projectCount }}</span>
-          </header>
-          <div class="game-grid">
-            @for (game of games; track game.title; let i = $index) {
-              <article class="game-card">
-                <img class="game-image" [src]="game.image" [alt]="copy().games[i].imageAlt" />
-                <div class="game-info">
-                  <div class="game-title-row"><h2>{{ game.title }}</h2><span class="game-status" [class.status-live]="game.link">{{ copy().games[i].status }}</span></div>
-                  <p class="game-genre">{{ copy().games[i].genre }}</p>
-                  <p class="game-description">{{ copy().games[i].description }}</p>
-                  @if (game.link) {
-                    <a class="game-link" [href]="game.link" target="_blank" rel="noopener noreferrer">{{ copy().games[i].play }} <span>↗</span></a>
-                  }
-                </div>
-              </article>
-            }
-          </div>
-        </section>
-      }
-      @case ('habilidades') {
-        <section class="view content-view skills-view" aria-labelledby="skills-title">
-          <header class="section-heading"><div><p class="eyebrow">{{ copy().skillsEyebrow }}</p><h1 id="skills-title">{{ copy().skillsTitle }}</h1></div></header>
-          <div class="skill-tabs" role="tablist" [attr.aria-label]="copy().skillCategoriesLabel">
-            @for (group of copy().skillGroups; track group.title; let i = $index) {
-              <button type="button" role="tab" [attr.aria-selected]="activeSkillGroup() === i" [class.skill-tab-active]="activeSkillGroup() === i" (click)="selectSkillGroup(i)">{{ group.tabLabel }}</button>
-            }
-          </div>
-          @if (skillGroups[activeSkillGroup()]; as group) {
-            <article class="skill-card" role="tabpanel">
-              <h2>{{ copy().skillGroups[activeSkillGroup()].title }}</h2>
-              <div class="skill-tags">
-                @for (skill of group.skills; track skill) { <span>{{ skill }}</span> }
-              </div>
-            </article>
+  <!-- FEATURED -->
+  <section class="featured" aria-labelledby="featured-title">
+    <div class="wrap featured-grid">
+      <a class="featured-media pixel-frame" [href]="rapha.link" target="_blank" rel="noopener noreferrer">
+        <img [src]="rapha.image" [alt]="c.featured.imageAlt" [width]="rapha.width" [height]="rapha.height" loading="lazy" />
+        <span class="badge badge-gold">★ {{ c.featured.badge }}</span>
+      </a>
+      <div class="featured-copy">
+        <p class="eyebrow">{{ c.featured.eyebrow }}</p>
+        <h2 id="featured-title">{{ c.featured.title }}</h2>
+        <p class="genre">{{ c.featured.genre }}</p>
+        <p>{{ c.featured.description }}</p>
+        <h3 class="credits-title">{{ c.featured.creditsTitle }}</h3>
+        <ul class="credits">
+          @for (cr of c.featured.credits; track cr.role) {
+            <li><span>{{ cr.role }}</span><span class="dots" aria-hidden="true"></span><strong>Joanna</strong><small>{{ cr.detail }}</small></li>
           }
-        </section>
-      }
-      @case ('experiencia') {
-        <section class="view content-view experience-view" aria-labelledby="experience-title">
-          <header class="section-heading">
-            <div><p class="eyebrow">{{ copy().experienceEyebrow }}</p><h1 id="experience-title">{{ copy().experienceTitle }}</h1></div>
-            <a class="cv-download" href="/files/joanna-sakugawa-cv-es.pdf" download="Joanna-Sakugawa-CV.pdf">{{ copy().downloadCv }} <span>↓</span></a>
-          </header>
-          <div class="experience-tabs" role="tablist" [attr.aria-label]="copy().experienceSectionsLabel">
-            <button type="button" role="tab" [attr.aria-selected]="activeExperienceSection() === 'laboral'" [class.experience-tab-active]="activeExperienceSection() === 'laboral'" (click)="selectExperienceSection('laboral')">{{ copy().workExperience }}</button>
-            <button type="button" role="tab" [attr.aria-selected]="activeExperienceSection() === 'formacion'" [class.experience-tab-active]="activeExperienceSection() === 'formacion'" (click)="selectExperienceSection('formacion')">{{ copy().educationTab }}</button>
-          </div>
-          @if (activeExperienceSection() === 'laboral') {
-            <div class="experience-list" role="tabpanel">
-              @for (job of copy().experience; track job.company; let i = $index) {
-                <article class="experience-item">
-                  <span class="experience-period">{{ job.period }}</span>
-                  <div class="experience-main">
-                    <h2>{{ job.role }} <span>· {{ job.company }}</span></h2>
-                    <p>{{ job.summary }}</p>
-                    <small>{{ job.stack }}</small>
-                  </div>
-                </article>
+        </ul>
+        <a class="btn btn-primary" [href]="rapha.link" target="_blank" rel="noopener noreferrer">▶ {{ c.featured.play }}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAMES -->
+  <section id="games" class="section" aria-labelledby="games-title">
+    <div class="wrap">
+      <header class="section-head">
+        <div>
+          <p class="eyebrow">{{ c.games.eyebrow }}</p>
+          <h2 id="games-title">{{ c.games.title }}</h2>
+          <p class="section-intro">{{ c.games.intro }}</p>
+        </div>
+        <div class="filters" role="group" [attr.aria-label]="c.games.filtersLabel">
+          @for (f of filters; track f) {
+            <button type="button" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
+              {{ c.games.filters[f] }} <span class="count">{{ counts[f] }}</span>
+            </button>
+          }
+        </div>
+      </header>
+
+      <ul class="game-grid">
+        @for (g of visibleGames(); track g.id) {
+          @let gc = c.games.items[g.id];
+          <li class="game-card">
+            <div class="game-media">
+              @if (g.image) {
+                <img [src]="g.image" [alt]="gc.imageAlt" [width]="g.width" [height]="g.height" loading="lazy" />
+              } @else {
+                <div class="game-placeholder">
+                  <svg viewBox="0 0 16 16" role="img" [attr.aria-label]="gc.imageAlt" shape-rendering="crispEdges">
+                    @for (p of pomponPixels; track $index) {
+                      <rect [attr.x]="p.x" [attr.y]="p.y" width="1" height="1" [attr.fill]="p.fill" />
+                    }
+                  </svg>
+                  <span>{{ c.games.screenshotSoon }}</span>
+                </div>
+              }
+              <span class="engine engine-{{ g.engine.toLowerCase() }}">{{ g.engine }}</span>
+            </div>
+            <div class="game-body">
+              <div class="game-status">
+                <span class="status" [class.live]="g.released">{{ g.released ? c.games.released : c.games.inDev }}</span>
+                @if (g.browser) { <span class="platform">{{ c.games.browser }}</span> }
+                @if (g.id === 'pompon') { <span class="platform">{{ c.games.mobile }}</span> }
+              </div>
+              <h3>{{ gc.title }}</h3>
+              <p class="genre">{{ gc.genre }}</p>
+              <p class="game-desc">{{ gc.description }}</p>
+              <ul class="tags">
+                @for (t of g.tags; track t) { <li>{{ t }}</li> }
+              </ul>
+              @if (g.link) {
+                <a class="btn btn-small" [href]="g.link" target="_blank" rel="noopener noreferrer">▶ {{ c.games.play }} <span class="sr-only">{{ gc.title }}</span></a>
+              } @else {
+                <span class="btn btn-small btn-disabled">{{ c.games.soon }}</span>
               }
             </div>
-          } @else {
-            <div class="education-list" role="tabpanel">
-              @for (item of copy().education; track item.title; let i = $index) {
-                <article class="education-item">
-                  <span class="education-date">{{ item.period }}</span>
-                  <div><h2>{{ item.title }}</h2><p>{{ item.place }}</p></div>
-                  @if (i === 0) { <span class="education-current">{{ copy().current }}</span> }
-                    </article>
-                  }
-            </div>
-          }
-        </section>
-      }
-      @case ('contacto') {
-        <section class="view content-view contact-view" aria-labelledby="contact-title">
-          <div class="contact-copy">
-            <p class="eyebrow">{{ copy().contactEyebrow }}</p>
-            <h1 id="contact-title">{{ copy().contactTitle }}</h1>
-            <p>{{ copy().contactIntroduction }}</p>
-          </div>
-          <div class="contact-list">
-            @for (contact of contactLinks; track contact.href; let i = $index) {
-              <a [href]="contact.href" [attr.target]="contact.label === 'Email' ? null : '_blank'" rel="noopener noreferrer">
-                {{ copy().contactLinks[i] }} <span>{{ contact.label === 'Email' ? '✉' : '↗' }}</span>
-              </a>
-            }
-          </div>
-        </section>
-      }
-    }
-  </main>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
 
-  <footer class="footer"><span>© 2026 Joanna Rocío Sakugawa</span><span>{{ copy().footerRole }}</span></footer>
-</div>
+  <!-- ABOUT -->
+  <section id="about" class="section section-alt" aria-labelledby="about-title">
+    <div class="wrap about-grid">
+      <div class="about-photo pixel-frame">
+        <img src="/images/joanna.jpg" alt="Joanna Rocío Sakugawa" width="600" height="600" loading="lazy" />
+      </div>
+      <div>
+        <p class="eyebrow">{{ c.about.eyebrow }}</p>
+        <h2 id="about-title">{{ c.about.title }}</h2>
+        @for (p of c.about.paragraphs; track $index) { <p>{{ p }}</p> }
+        <dl class="facts">
+          <div><dt>{{ c.about.locationTitle }}</dt><dd>{{ c.about.location }}</dd></div>
+          <div><dt>{{ c.about.languagesTitle }}</dt><dd>{{ c.about.languages.join(' · ') }}</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="section" aria-labelledby="skills-title">
+    <div class="wrap">
+      <header class="section-head">
+        <div>
+          <p class="eyebrow">{{ c.skills.eyebrow }}</p>
+          <h2 id="skills-title">{{ c.skills.title }}</h2>
+          <p class="section-intro">{{ c.skills.intro }}</p>
+        </div>
+      </header>
+      <ol class="pipeline">
+        @for (step of c.skills.pipeline; track step.title; let i = $index) {
+          <li class="slot">
+            <span class="slot-icon icon-{{ pipelineIcons[i] }}" aria-hidden="true"></span>
+            <span class="slot-num" aria-hidden="true">0{{ i + 1 }}</span>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.detail }}</p>
+            <ul class="tags">
+              @for (t of pipelineTools[i]; track t) { <li>{{ t }}</li> }
+            </ul>
+          </li>
+        }
+      </ol>
+      <div class="web-skills">
+        <div>
+          <h3>{{ c.skills.webTitle }}</h3>
+          <p>{{ c.skills.webIntro }}</p>
+        </div>
+        <ul class="tags">
+          @for (t of webSkills; track t) { <li>{{ t }}</li> }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="section section-alt" aria-labelledby="experience-title">
+    <div class="wrap exp-grid">
+      <div>
+        <p class="eyebrow">{{ c.experience.eyebrow }}</p>
+        <h2 id="experience-title">{{ c.experience.title }}</h2>
+        <ol class="timeline">
+          @for (job of c.experience.jobs; track $index; let i = $index) {
+            <li>
+              <span class="period">{{ job.period }}</span>
+              <h3>{{ job.role }} <span>· {{ jobs[i].company }}</span></h3>
+              <p>{{ job.summary }}</p>
+              <small>{{ jobs[i].stack }}</small>
+            </li>
+          }
+        </ol>
+      </div>
+      <aside class="edu">
+        <h3 class="edu-title">{{ c.experience.educationTitle }}</h3>
+        @for (e of c.experience.education; track e.title) {
+          <article class="edu-card" [class.current]="e.current">
+            @if (e.current) { <span class="badge">{{ c.experience.current }}</span> }
+            <h4>{{ e.title }}</h4>
+            <p>{{ e.place }}</p>
+            <small>{{ e.period }}</small>
+          </article>
+        }
+        <div class="cv-links">
+          <a class="btn btn-ghost" [href]="links.cvEs" download>{{ c.experience.downloadEs }} <span aria-hidden="true">↓</span></a>
+          <a class="btn btn-ghost" [href]="links.cvEn" download>{{ c.experience.downloadEn }} <span aria-hidden="true">↓</span></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section contact" aria-labelledby="contact-title">
+    <div class="wrap contact-box pixel-frame">
+      <p class="eyebrow blink">{{ c.contact.eyebrow }}</p>
+      <h2 id="contact-title">{{ c.contact.title }}</h2>
+      <p class="section-intro">{{ c.contact.intro }}</p>
+      <a class="btn btn-primary btn-big" [href]="'mailto:' + links.email">✉ {{ c.contact.email }}</a>
+      <p class="email-text">{{ links.email }}</p>
+      <ul class="socials">
+        <li><a [href]="links.itch" target="_blank" rel="noopener noreferrer">{{ c.contact.itch }} ↗</a></li>
+        <li><a [href]="links.linkedin" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>
+        <li><a [href]="links.github" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>© {{ year }} Joanna Rocío Sakugawa</span>
+    <span>{{ c.footer }}</span>
+  </div>
+</footer>

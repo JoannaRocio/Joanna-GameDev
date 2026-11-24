@@ -3,44 +3,50 @@ import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [App],
-    })
-      .compileComponents();
+    await TestBed.configureTestingModule({ imports: [App] }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it('should default to English and switch all portfolio sections to Spanish', async () => {
+  it('renders all five games in Spanish', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.getAttribute('aria-label')).toBe('Joanna Rocío Sakugawa');
-    expect(compiled.textContent).toContain('PLAYER PROFILE');
-    expect(compiled.textContent).toContain('Home');
-
-    const gamesTab = Array.from(compiled.querySelectorAll<HTMLButtonElement>('.tab')).find((button) =>
-      button.textContent?.includes('Games'),
-    );
-    gamesTab?.click();
+    const el = fixture.nativeElement as HTMLElement;
+    Array.from(el.querySelectorAll<HTMLButtonElement>('.lang-switch button')).find((b) => b.textContent?.trim() === 'ES')!.click();
     fixture.detectChanges();
+    expect(el.querySelector('h1')?.textContent).toContain('Sakugawa');
+    expect(el.textContent).toContain('Rapha vuelve a casa');
+    for (const title of ['Fishing Fish', 'El sueño de Dona', "Memo's Island", 'Pompon Friends']) {
+      expect(el.textContent).toContain(title);
+    }
+    expect(el.textContent).toContain('Licenciatura en Desarrollo y Producción de Videojuegos');
+  });
 
-    expect(compiled.textContent).toContain('Fishing Fish');
-    expect(compiled.textContent).toContain("Memo's Island");
-    expect(compiled.textContent).toContain('PLAYABLE IN BROWSER');
+  it('switches to English and Japanese', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = (label: string) =>
+      Array.from(el.querySelectorAll<HTMLButtonElement>('.lang-switch button')).find((b) => b.textContent?.trim() === label)!;
 
-    const spanishButton = Array.from(compiled.querySelectorAll<HTMLButtonElement>('.language-switch button')).find(
-      (button) => button.textContent?.trim() === 'ES',
-    );
-    spanishButton?.click();
+    btn('EN').click();
     fixture.detectChanges();
+    expect(el.textContent).toContain('Rapha Goes Home');
+    expect(el.textContent).toContain("Dona's Dream");
+    expect(document.documentElement.lang).toBe('en');
 
-    expect(compiled.textContent).toContain('Jugar en itch.io');
-    expect(compiled.textContent).toContain('Juegos');
-    expect(document.documentElement.lang).toBe('es');
+    btn('JA').click();
+    fixture.detectChanges();
+    expect(el.textContent).toContain('制作したゲーム');
+    expect(document.documentElement.lang).toBe('ja');
+  });
+
+  it('filters games by engine', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const godot = Array.from(el.querySelectorAll<HTMLButtonElement>('.filters button')).find((b) => b.textContent?.includes('Godot'))!;
+    godot.click();
+    fixture.detectChanges();
+    expect(el.querySelectorAll('.game-card').length).toBe(1);
+    expect(el.querySelector('.game-card')?.textContent).toContain('Pompon Friends');
   });
 });

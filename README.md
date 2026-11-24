@@ -1,6 +1,6 @@
 # Joanna Sakugawa — Game Developer Portfolio
 
-Personal portfolio built with Angular, TypeScript, and Tailwind CSS. The site is available in English and Spanish and features game development projects, professional experience, skills, education, and contact links.
+Personal portfolio built with Angular, TypeScript, and Tailwind CSS. The site is available in Spanish, English and Japanese (texts live in `src/app/content.ts`) and features game projects, skills, professional experience, education, and contact links. The language is picked from `?lang=es|en|ja`, the visitor's saved choice, or the browser language.
 
 ## Requirements
 

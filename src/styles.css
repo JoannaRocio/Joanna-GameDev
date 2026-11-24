@@ -1,6 +1,58 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+:root {
+  --bg: #0f1330;
+  --bg-alt: #151b40;
+  --panel: #1c2353;
+  --panel-2: #232c63;
+  --line: rgba(220, 226, 255, 0.14);
+  --text: #f5f3ff;
+  --muted: #c3c8e8;
+  --green: #7ce85a;
+  --green-dark: #3f9c2c;
+  --yellow: #f5d547;
+  --yellow-dark: #b39418;
+  --sky: #8dc3e7;
+  --pink: #ff8ccf;
+  --font-body: "Nunito", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font-pixel: "Pixelify Sans", "Nunito", "Hiragino Sans", "Yu Gothic UI", "Meiryo", monospace;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 76px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 body {
-  @apply bg-dark text-slate-300 font-sans antialiased;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+:lang(ja) body,
+html:lang(ja) {
+  line-height: 1.8;
+}
+
+::selection {
+  background: var(--green);
+  color: #0f1330;
 }
