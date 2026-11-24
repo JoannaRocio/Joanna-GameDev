@@ -11,11 +11,26 @@ import {
   Lang,
   PIPELINE_TOOLS,
   RAPHA,
+  SPRITES,
+  TRACKS,
+  TrackId,
   WEB_SKILLS,
 } from './content';
 
 type Filter = 'all' | 'unity' | 'godot' | 'playable';
-type SectionId = 'games' | 'about' | 'skills' | 'experience' | 'contact';
+type TabId = 'inicio' | 'juegos' | 'arte' | 'sobre-mi' | 'habilidades' | 'experiencia' | 'contacto';
+type NavKey = 'home' | 'games' | 'art' | 'about' | 'skills' | 'experience' | 'contact';
+
+const TABS: { id: TabId; key: NavKey; icon: string }[] = [
+  { id: 'inicio', key: 'home', icon: '⌂' },
+  { id: 'juegos', key: 'games', icon: '▶' },
+  { id: 'arte', key: 'art', icon: '♪' },
+  { id: 'sobre-mi', key: 'about', icon: '☺' },
+  { id: 'habilidades', key: 'skills', icon: '✦' },
+  { id: 'experiencia', key: 'experience', icon: '◆' },
+  { id: 'contacto', key: 'contact', icon: '✉' },
+];
+const isTab = (v: string): v is TabId => TABS.some((t) => t.id === v);
 
 const STORAGE_KEY = 'portfolio-lang';
 
@@ -31,34 +46,6 @@ function matches(game: GameData, filter: Filter): boolean {
       return true;
   }
 }
-
-/** Pixel art for the Pompon Friends card (no screenshot yet). 0 = empty. */
-const POMPON = [
-  '....11111111....',
-  '..112222222211..',
-  '.12222222222221.',
-  '.12222222222221.',
-  '1222222222222221',
-  '1223322222233221',
-  '1223322222233221',
-  '1222222222222221',
-  '1244222442224421',
-  '1222222222222221',
-  '1222222552222221',
-  '.12222222222221.',
-  '.12222222222221.',
-  '..112222222211..',
-  '...1166..6611...',
-  '....11....11....',
-];
-const POMPON_COLORS: Record<string, string> = {
-  '1': '#7b2f63',
-  '2': '#ff9ccf',
-  '3': '#2b1630',
-  '4': '#ff6fae',
-  '5': '#c2185b',
-  '6': '#f5d547',
-};
 
 @Component({
   selector: 'app-root',
@@ -80,17 +67,16 @@ export class App {
   protected readonly year = 2026;
   protected readonly pipelineIcons = ['code', 'art', 'audio', 'tools'];
 
-  protected readonly pomponPixels = POMPON.flatMap((row, y) =>
-    [...row].flatMap((c, x) => (POMPON_COLORS[c] ? [{ x, y, fill: POMPON_COLORS[c] }] : [])),
-  );
-
   protected readonly language = signal<Lang>('es');
   protected readonly copy = computed(() => COPY[this.language()]);
   protected readonly filter = signal<Filter>('all');
-  protected readonly menuOpen = signal(false);
-  protected readonly activeSection = signal<SectionId | null>(null);
-
-  protected readonly sections: SectionId[] = ['games', 'about', 'skills', 'experience', 'contact'];
+  protected readonly activeTab = signal<TabId>('inicio');
+  protected readonly tabs = TABS;
+  protected readonly spriteGroups = SPRITES;
+  protected readonly tracks = TRACKS;
+  protected readonly playing = signal<TrackId | null>(null);
+  protected readonly progress = signal(0);
+  private audio?: HTMLAudioElement;
   protected readonly filters: Filter[] = ['all', 'unity', 'godot', 'playable'];
 
   protected readonly visibleGames = computed(() => GAMES.filter((g) => matches(g, this.filter())));
@@ -113,7 +99,7 @@ export class App {
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
       this.language.set(this.initialLanguage());
-      this.observeSections(destroyRef);
+      this.syncTabWithHash(destroyRef);
     });
   }
 
@@ -131,12 +117,35 @@ export class App {
     this.filter.set(filter);
   }
 
-  protected toggleMenu(): void {
-    this.menuOpen.update((open) => !open);
+  protected toggleTrack(id: TrackId): void {
+    if (!this.isBrowser) return;
+    const track = TRACKS.find((t) => t.id === id)!;
+    if (!this.audio) {
+      this.audio = new Audio();
+      this.audio.addEventListener('timeupdate', () => {
+        const a = this.audio!;
+        this.progress.set(a.duration ? a.currentTime / a.duration : 0);
+      });
+      this.audio.addEventListener('ended', () => {
+        this.playing.set(null);
+        this.progress.set(0);
+      });
+    }
+    if (this.playing() === id) {
+      this.audio.pause();
+      this.playing.set(null);
+      return;
+    }
+    if (!this.audio.src.endsWith(track.src)) {
+      this.audio.src = track.src;
+      this.progress.set(0);
+    }
+    this.audio.play().catch(() => this.playing.set(null));
+    this.playing.set(id);
   }
 
-  protected closeMenu(): void {
-    this.menuOpen.set(false);
+  protected formatTime(seconds: number): string {
+    return `${Math.floor(seconds / 60)}:${String(Math.round(seconds % 60)).padStart(2, '0')}`;
   }
 
   private initialLanguage(): Lang {
@@ -156,20 +165,21 @@ export class App {
     return 'es';
   }
 
-  private observeSections(destroyRef: DestroyRef): void {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) this.activeSection.set(entry.target.id as SectionId);
-        }
-      },
-      { rootMargin: '-45% 0px -50% 0px' },
-    );
-    for (const id of this.sections) {
-      const el = this.document.getElementById(id);
-      if (el) observer.observe(el);
-    }
-    destroyRef.onDestroy(() => observer.disconnect());
+  /** Each tab has its own link (#juegos, #contacto...), so the back button and shared links work. */
+  private syncTabWithHash(destroyRef: DestroyRef): void {
+    const apply = (scroll: boolean) => {
+      const hash = decodeURIComponent(location.hash.slice(1));
+      if (hash !== '' && !isTab(hash)) return; // e.g. the skip link
+      this.activeTab.set(hash === '' ? 'inicio' : hash);
+      if (this.activeTab() !== 'arte' && this.playing()) {
+        this.audio?.pause();
+        this.playing.set(null);
+      }
+      if (scroll) window.scrollTo({ top: 0 });
+    };
+    apply(false);
+    const onHash = () => apply(true);
+    window.addEventListener('hashchange', onHash);
+    destroyRef.onDestroy(() => window.removeEventListener('hashchange', onHash));
   }
 }

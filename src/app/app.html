@@ -3,263 +3,315 @@
 
 <header class="topbar">
   <div class="wrap topbar-inner">
-    <a class="brand" href="#top" (click)="closeMenu()">
+    <a class="brand" href="#inicio">
       <span class="brand-mark" aria-hidden="true">JS</span>
       <span class="brand-name">Joanna Sakugawa</span>
     </a>
-
-    <button
-      class="menu-toggle"
-      type="button"
-      [attr.aria-expanded]="menuOpen()"
-      aria-controls="site-nav"
-      (click)="toggleMenu()"
-    >
-      <span class="menu-bars" aria-hidden="true"></span>
-      <span class="sr-only">{{ c.menu }}</span>
-    </button>
-
-    <nav id="site-nav" class="site-nav" [class.open]="menuOpen()" [attr.aria-label]="c.menu">
-      <ul>
-        @for (id of sections; track id) {
-          <li>
-            <a [href]="'#' + id" [class.active]="activeSection() === id" [attr.aria-current]="activeSection() === id ? 'true' : null" (click)="closeMenu()">{{ c.nav[id] }}</a>
-          </li>
-        }
-      </ul>
-      <div class="lang-switch" role="group" [attr.aria-label]="c.langLabel">
-        @for (l of langs; track l.id) {
-          <button type="button" [attr.lang]="l.id" [attr.title]="l.name" [attr.aria-pressed]="language() === l.id" (click)="setLanguage(l.id)">
-            {{ l.label }}
-          </button>
-        }
-      </div>
-    </nav>
+    <div class="lang-switch" role="group" [attr.aria-label]="c.langLabel">
+      @for (l of langs; track l.id) {
+        <button type="button" [attr.lang]="l.id" [attr.title]="l.name" [attr.aria-pressed]="language() === l.id" (click)="setLanguage(l.id)">
+          {{ l.label }}
+        </button>
+      }
+    </div>
   </div>
+  <nav class="tabbar" [attr.aria-label]="c.menu">
+    <ul class="wrap tabs">
+      @for (t of tabs; track t.id) {
+        <li>
+          <a class="tab" [href]="'#' + t.id" [class.active]="activeTab() === t.id" [attr.aria-current]="activeTab() === t.id ? 'page' : null">
+            <span class="tab-icon" aria-hidden="true">{{ t.icon }}</span>{{ c.nav[t.key] }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
 </header>
 
-<main id="main">
-  <!-- HERO -->
-  <section id="top" class="hero">
-    <div class="sky" aria-hidden="true">
-      <span class="cloud cloud-1"></span><span class="cloud cloud-2"></span><span class="cloud cloud-3"></span>
-      <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span>
-    </div>
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">{{ c.hero.eyebrow }}</p>
-        <h1>Joanna Rocío <span class="accent">Sakugawa</span></h1>
-        <p class="hero-role">{{ c.hero.role }}</p>
-        <p class="hero-intro">{{ c.hero.intro }}</p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#games">{{ c.hero.ctaGames }}</a>
-          <a class="btn btn-ghost" [href]="cvHref()" download>{{ c.hero.ctaCv }} <span aria-hidden="true">↓</span></a>
-        </div>
-        <dl class="hud">
-          @for (s of c.hero.stats; track s.label) {
-            <div><dt>{{ s.label }}</dt><dd>{{ s.value }}</dd></div>
-          }
-        </dl>
-      </div>
-
-      <div class="hero-art" aria-hidden="true">
-        <div class="screen screen-back"><img src="/images/memos-island.png" alt="" width="898" height="492" /></div>
-        <div class="screen screen-mid"><img src="/images/fishing-fish.png" alt="" width="1365" height="768" /></div>
-        <div class="screen screen-front">
-          <img [src]="rapha.image" alt="" [width]="rapha.width" [height]="rapha.height" />
-          <span class="press-start">{{ c.hero.pressStart }}</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURED -->
-  <section class="featured" aria-labelledby="featured-title">
-    <div class="wrap featured-grid">
-      <a class="featured-media pixel-frame" [href]="rapha.link" target="_blank" rel="noopener noreferrer">
-        <img [src]="rapha.image" [alt]="c.featured.imageAlt" [width]="rapha.width" [height]="rapha.height" loading="lazy" />
-        <span class="badge badge-gold">★ {{ c.featured.badge }}</span>
-      </a>
-      <div class="featured-copy">
-        <p class="eyebrow">{{ c.featured.eyebrow }}</p>
-        <h2 id="featured-title">{{ c.featured.title }}</h2>
-        <p class="genre">{{ c.featured.genre }}</p>
-        <p>{{ c.featured.description }}</p>
-        <h3 class="credits-title">{{ c.featured.creditsTitle }}</h3>
-        <ul class="credits">
-          @for (cr of c.featured.credits; track cr.role) {
-            <li><span>{{ cr.role }}</span><span class="dots" aria-hidden="true"></span><strong>Joanna</strong><small>{{ cr.detail }}</small></li>
-          }
-        </ul>
-        <a class="btn btn-primary" [href]="rapha.link" target="_blank" rel="noopener noreferrer">▶ {{ c.featured.play }}</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- GAMES -->
-  <section id="games" class="section" aria-labelledby="games-title">
-    <div class="wrap">
-      <header class="section-head">
-        <div>
-          <p class="eyebrow">{{ c.games.eyebrow }}</p>
-          <h2 id="games-title">{{ c.games.title }}</h2>
-          <p class="section-intro">{{ c.games.intro }}</p>
-        </div>
-        <div class="filters" role="group" [attr.aria-label]="c.games.filtersLabel">
-          @for (f of filters; track f) {
-            <button type="button" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
-              {{ c.games.filters[f] }} <span class="count">{{ counts[f] }}</span>
-            </button>
-          }
-        </div>
-      </header>
-
-      <ul class="game-grid">
-        @for (g of visibleGames(); track g.id) {
-          @let gc = c.games.items[g.id];
-          <li class="game-card">
-            <div class="game-media">
-              @if (g.image) {
-                <img [src]="g.image" [alt]="gc.imageAlt" [width]="g.width" [height]="g.height" loading="lazy" />
-              } @else {
-                <div class="game-placeholder">
-                  <svg viewBox="0 0 16 16" role="img" [attr.aria-label]="gc.imageAlt" shape-rendering="crispEdges">
-                    @for (p of pomponPixels; track $index) {
-                      <rect [attr.x]="p.x" [attr.y]="p.y" width="1" height="1" [attr.fill]="p.fill" />
-                    }
-                  </svg>
-                  <span>{{ c.games.screenshotSoon }}</span>
-                </div>
-              }
-              <span class="engine engine-{{ g.engine.toLowerCase() }}">{{ g.engine }}</span>
-            </div>
-            <div class="game-body">
-              <div class="game-status">
-                <span class="status" [class.live]="g.released">{{ g.released ? c.games.released : c.games.inDev }}</span>
-                @if (g.browser) { <span class="platform">{{ c.games.browser }}</span> }
-                @if (g.id === 'pompon') { <span class="platform">{{ c.games.mobile }}</span> }
+<main id="main" class="tab-panel">
+  @switch (activeTab()) {
+    @case ('inicio') {
+      <!-- HERO -->
+        <section class="hero">
+          <div class="sky" aria-hidden="true">
+            <span class="cloud cloud-1"></span><span class="cloud cloud-2"></span><span class="cloud cloud-3"></span>
+            <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span>
+          </div>
+          <div class="wrap hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">{{ c.hero.eyebrow }}</p>
+              <h1>Joanna Rocío <span class="accent">Sakugawa</span></h1>
+              <p class="hero-role">{{ c.hero.role }}</p>
+              <p class="hero-intro">{{ c.hero.intro }}</p>
+              <div class="cta-row">
+                <a class="btn btn-primary" href="#juegos">{{ c.hero.ctaGames }}</a>
+                <a class="btn btn-ghost" [href]="cvHref()" download>{{ c.hero.ctaCv }} <span aria-hidden="true">↓</span></a>
               </div>
-              <h3>{{ gc.title }}</h3>
-              <p class="genre">{{ gc.genre }}</p>
-              <p class="game-desc">{{ gc.description }}</p>
-              <ul class="tags">
-                @for (t of g.tags; track t) { <li>{{ t }}</li> }
+              <dl class="hud">
+                @for (s of c.hero.stats; track s.label) {
+                  <div><dt>{{ s.label }}</dt><dd>{{ s.value }}</dd></div>
+                }
+              </dl>
+            </div>
+
+            <div class="hero-art" aria-hidden="true">
+              <div class="screen screen-back"><img src="/images/memos-island.png" alt="" width="898" height="492" /></div>
+              <div class="screen screen-mid"><img src="/images/fishing-fish.png" alt="" width="1365" height="768" /></div>
+              <div class="screen screen-front">
+                <img [src]="rapha.image" alt="" [width]="rapha.width" [height]="rapha.height" />
+                <span class="press-start">{{ c.hero.pressStart }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      <!-- FEATURED -->
+        <section class="featured" aria-labelledby="featured-title">
+          <div class="wrap featured-grid">
+            <a class="featured-media pixel-frame" [href]="rapha.link" target="_blank" rel="noopener noreferrer">
+              <img [src]="rapha.image" [alt]="c.featured.imageAlt" [width]="rapha.width" [height]="rapha.height" loading="lazy" />
+              <span class="badge badge-gold">★ {{ c.featured.badge }}</span>
+            </a>
+            <div class="featured-copy">
+              <p class="eyebrow">{{ c.featured.eyebrow }}</p>
+              <h2 id="featured-title">{{ c.featured.title }}</h2>
+              <p class="genre">{{ c.featured.genre }}</p>
+              <p>{{ c.featured.description }}</p>
+              <h3 class="credits-title">{{ c.featured.creditsTitle }}</h3>
+              <ul class="credits">
+                @for (cr of c.featured.credits; track cr.role) {
+                  <li><span>{{ cr.role }}</span><span class="dots" aria-hidden="true"></span><strong>Joanna</strong><small>{{ cr.detail }}</small></li>
+                }
               </ul>
-              @if (g.link) {
-                <a class="btn btn-small" [href]="g.link" target="_blank" rel="noopener noreferrer">▶ {{ c.games.play }} <span class="sr-only">{{ gc.title }}</span></a>
-              } @else {
-                <span class="btn btn-small btn-disabled">{{ c.games.soon }}</span>
+              <a class="btn btn-primary" [href]="rapha.link" target="_blank" rel="noopener noreferrer">▶ {{ c.featured.play }}</a>
+            </div>
+          </div>
+        </section>
+    }
+    @case ('juegos') {
+      <!-- GAMES -->
+        <section class="section" aria-labelledby="games-title">
+          <div class="wrap">
+            <header class="section-head">
+              <div>
+                <p class="eyebrow">{{ c.games.eyebrow }}</p>
+                <h2 id="games-title">{{ c.games.title }}</h2>
+                <p class="section-intro">{{ c.games.intro }}</p>
+              </div>
+              <div class="filters" role="group" [attr.aria-label]="c.games.filtersLabel">
+                @for (f of filters; track f) {
+                  <button type="button" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
+                    {{ c.games.filters[f] }} <span class="count">{{ counts[f] }}</span>
+                  </button>
+                }
+              </div>
+            </header>
+
+            <ul class="game-grid">
+              @for (g of visibleGames(); track g.id) {
+                @let gc = c.games.items[g.id];
+                <li class="game-card">
+                  <div class="game-media">
+                    @if (g.screens) {
+                      <div class="phone-strip">
+                        @for (src of g.screens; track src; let i = $index) {
+                          <img [src]="src" [alt]="gc.screenAlts?.[i] ?? ''" width="540" height="960" loading="lazy" />
+                        }
+                      </div>
+                    } @else if (g.image) {
+                      <img [src]="g.image" [alt]="gc.imageAlt" [width]="g.width" [height]="g.height" loading="lazy" />
+                    }
+                    <span class="engine engine-{{ g.engine.toLowerCase() }}">{{ g.engine }}</span>
+                  </div>
+                  <div class="game-body">
+                    <div class="game-status">
+                      <span class="status" [class.live]="g.released">{{ g.released ? c.games.released : c.games.inDev }}</span>
+                      @if (g.browser) { <span class="platform">{{ c.games.browser }}</span> }
+                      @if (g.id === 'pompon') { <span class="platform">{{ c.games.mobile }}</span> }
+                    </div>
+                    <h3>{{ gc.title }}</h3>
+                    <p class="genre">{{ gc.genre }}</p>
+                    <p class="game-desc">{{ gc.description }}</p>
+                    <ul class="tags">
+                      @for (t of g.tags; track t) { <li>{{ t }}</li> }
+                    </ul>
+                    @if (g.link) {
+                      <a class="btn btn-small" [href]="g.link" target="_blank" rel="noopener noreferrer">▶ {{ c.games.play }} <span class="sr-only">{{ gc.title }}</span></a>
+                    } @else {
+                      <span class="btn btn-small btn-disabled">{{ c.games.soon }}</span>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        </section>
+    }
+    @case ('arte') {
+      <section class="section" aria-labelledby="art-title">
+        <div class="wrap">
+          <header class="section-head">
+            <div>
+              <p class="eyebrow">{{ c.art.eyebrow }}</p>
+              <h2 id="art-title">{{ c.art.title }}</h2>
+              <p class="section-intro">{{ c.art.intro }}</p>
+            </div>
+          </header>
+
+          <div class="art-layout">
+            <div class="sprite-groups">
+              @for (g of spriteGroups; track g.group) {
+                <section class="sprite-group" [attr.aria-label]="c.art.groups[g.group]">
+                  <h3>{{ c.art.groups[g.group] }}</h3>
+                  <ul class="sprite-grid">
+                    @for (sp of g.items; track sp.id) {
+                      <li class="sprite-cell">
+                        <div class="sprite-stage">
+                          <img [src]="sp.src" [alt]="c.art.sprites[sp.id]" [width]="sp.w" [height]="sp.h" loading="lazy" />
+                        </div>
+                        <span class="sprite-name">{{ c.art.sprites[sp.id] }}</span>
+                        @if (sp.frames) { <span class="sprite-frames">{{ sp.frames }} {{ c.art.frames }}</span> }
+                      </li>
+                    }
+                  </ul>
+                </section>
               }
             </div>
-          </li>
-        }
-      </ul>
-    </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section id="about" class="section section-alt" aria-labelledby="about-title">
-    <div class="wrap about-grid">
-      <div class="about-photo pixel-frame">
-        <img src="/images/joanna.jpg" alt="Joanna Rocío Sakugawa" width="600" height="600" loading="lazy" />
-      </div>
-      <div>
-        <p class="eyebrow">{{ c.about.eyebrow }}</p>
-        <h2 id="about-title">{{ c.about.title }}</h2>
-        @for (p of c.about.paragraphs; track $index) { <p>{{ p }}</p> }
-        <dl class="facts">
-          <div><dt>{{ c.about.locationTitle }}</dt><dd>{{ c.about.location }}</dd></div>
-          <div><dt>{{ c.about.languagesTitle }}</dt><dd>{{ c.about.languages.join(' · ') }}</dd></div>
-        </dl>
-      </div>
-    </div>
-  </section>
-
-  <!-- SKILLS -->
-  <section id="skills" class="section" aria-labelledby="skills-title">
-    <div class="wrap">
-      <header class="section-head">
-        <div>
-          <p class="eyebrow">{{ c.skills.eyebrow }}</p>
-          <h2 id="skills-title">{{ c.skills.title }}</h2>
-          <p class="section-intro">{{ c.skills.intro }}</p>
+            <aside class="music-player pixel-frame" aria-labelledby="music-title">
+              <h3 id="music-title">♪ {{ c.art.musicTitle }}</h3>
+              <p>{{ c.art.musicIntro }}</p>
+              <ol class="tracklist">
+                @for (t of tracks; track t.id; let i = $index) {
+                  <li [class.now]="playing() === t.id">
+                    <button type="button" class="track-btn" [attr.aria-pressed]="playing() === t.id" (click)="toggleTrack(t.id)">
+                      <span class="track-icon" aria-hidden="true">{{ playing() === t.id ? '❚❚' : '▶' }}</span>
+                      <span class="sr-only">{{ playing() === t.id ? c.art.pause : c.art.play }}:</span>
+                      <span class="track-name">{{ c.art.tracks[t.id] }}</span>
+                      <span class="track-time">{{ formatTime(t.duration) }}</span>
+                    </button>
+                    @if (playing() === t.id) {
+                      <div class="track-bar" aria-hidden="true"><span [style.width.%]="progress() * 100"></span></div>
+                    }
+                  </li>
+                }
+              </ol>
+              <div class="eq" [class.on]="playing()" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <p class="made-with">FL Studio Mobile · sfxr</p>
+            </aside>
+          </div>
         </div>
-      </header>
-      <ol class="pipeline">
-        @for (step of c.skills.pipeline; track step.title; let i = $index) {
-          <li class="slot">
-            <span class="slot-icon icon-{{ pipelineIcons[i] }}" aria-hidden="true"></span>
-            <span class="slot-num" aria-hidden="true">0{{ i + 1 }}</span>
-            <h3>{{ step.title }}</h3>
-            <p>{{ step.detail }}</p>
-            <ul class="tags">
-              @for (t of pipelineTools[i]; track t) { <li>{{ t }}</li> }
+      </section>
+    }
+    @case ('sobre-mi') {
+      <!-- ABOUT -->
+        <section class="section section-alt" aria-labelledby="about-title">
+          <div class="wrap about-grid">
+            <div class="about-photo pixel-frame">
+              <img src="/images/joanna.jpg" alt="Joanna Rocío Sakugawa" width="600" height="600" loading="lazy" />
+            </div>
+            <div>
+              <p class="eyebrow">{{ c.about.eyebrow }}</p>
+              <h2 id="about-title">{{ c.about.title }}</h2>
+              @for (p of c.about.paragraphs; track $index) { <p>{{ p }}</p> }
+              <dl class="facts">
+                <div><dt>{{ c.about.locationTitle }}</dt><dd>{{ c.about.location }}</dd></div>
+                <div><dt>{{ c.about.languagesTitle }}</dt><dd>{{ c.about.languages.join(' · ') }}</dd></div>
+              </dl>
+            </div>
+          </div>
+        </section>
+    }
+    @case ('habilidades') {
+      <!-- SKILLS -->
+        <section class="section" aria-labelledby="skills-title">
+          <div class="wrap">
+            <header class="section-head">
+              <div>
+                <p class="eyebrow">{{ c.skills.eyebrow }}</p>
+                <h2 id="skills-title">{{ c.skills.title }}</h2>
+                <p class="section-intro">{{ c.skills.intro }}</p>
+              </div>
+            </header>
+            <ol class="pipeline">
+              @for (step of c.skills.pipeline; track step.title; let i = $index) {
+                <li class="slot">
+                  <span class="slot-icon icon-{{ pipelineIcons[i] }}" aria-hidden="true"></span>
+                  <span class="slot-num" aria-hidden="true">0{{ i + 1 }}</span>
+                  <h3>{{ step.title }}</h3>
+                  <p>{{ step.detail }}</p>
+                  <ul class="tags">
+                    @for (t of pipelineTools[i]; track t) { <li>{{ t }}</li> }
+                  </ul>
+                </li>
+              }
+            </ol>
+            <div class="web-skills">
+              <div>
+                <h3>{{ c.skills.webTitle }}</h3>
+                <p>{{ c.skills.webIntro }}</p>
+              </div>
+              <ul class="tags">
+                @for (t of webSkills; track t) { <li>{{ t }}</li> }
+              </ul>
+            </div>
+          </div>
+        </section>
+    }
+    @case ('experiencia') {
+      <!-- EXPERIENCE -->
+        <section class="section section-alt" aria-labelledby="experience-title">
+          <div class="wrap exp-grid">
+            <div>
+              <p class="eyebrow">{{ c.experience.eyebrow }}</p>
+              <h2 id="experience-title">{{ c.experience.title }}</h2>
+              <ol class="timeline">
+                @for (job of c.experience.jobs; track $index; let i = $index) {
+                  <li>
+                    <span class="period">{{ job.period }}</span>
+                    <h3>{{ job.role }} <span>· {{ jobs[i].company }}</span></h3>
+                    <p>{{ job.summary }}</p>
+                    <small>{{ jobs[i].stack }}</small>
+                  </li>
+                }
+              </ol>
+            </div>
+            <aside class="edu">
+              <h3 class="edu-title">{{ c.experience.educationTitle }}</h3>
+              @for (e of c.experience.education; track e.title) {
+                <article class="edu-card" [class.current]="e.current">
+                  @if (e.current) { <span class="badge">{{ c.experience.current }}</span> }
+                  <h4>{{ e.title }}</h4>
+                  <p>{{ e.place }}</p>
+                  <small>{{ e.period }}</small>
+                </article>
+              }
+              <div class="cv-links">
+                <a class="btn btn-ghost" [href]="links.cvEs" download>{{ c.experience.downloadEs }} <span aria-hidden="true">↓</span></a>
+                <a class="btn btn-ghost" [href]="links.cvEn" download>{{ c.experience.downloadEn }} <span aria-hidden="true">↓</span></a>
+              </div>
+            </aside>
+          </div>
+        </section>
+    }
+    @case ('contacto') {
+      <!-- CONTACT -->
+        <section class="section contact" aria-labelledby="contact-title">
+          <div class="wrap contact-box pixel-frame">
+            <p class="eyebrow blink">{{ c.contact.eyebrow }}</p>
+            <h2 id="contact-title">{{ c.contact.title }}</h2>
+            <p class="section-intro">{{ c.contact.intro }}</p>
+            <a class="btn btn-primary btn-big" [href]="'mailto:' + links.email">✉ {{ c.contact.email }}</a>
+            <p class="email-text">{{ links.email }}</p>
+            <ul class="socials">
+              <li><a [href]="links.itch" target="_blank" rel="noopener noreferrer">{{ c.contact.itch }} ↗</a></li>
+              <li><a [href]="links.linkedin" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>
+              <li><a [href]="links.github" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
             </ul>
-          </li>
-        }
-      </ol>
-      <div class="web-skills">
-        <div>
-          <h3>{{ c.skills.webTitle }}</h3>
-          <p>{{ c.skills.webIntro }}</p>
-        </div>
-        <ul class="tags">
-          @for (t of webSkills; track t) { <li>{{ t }}</li> }
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section id="experience" class="section section-alt" aria-labelledby="experience-title">
-    <div class="wrap exp-grid">
-      <div>
-        <p class="eyebrow">{{ c.experience.eyebrow }}</p>
-        <h2 id="experience-title">{{ c.experience.title }}</h2>
-        <ol class="timeline">
-          @for (job of c.experience.jobs; track $index; let i = $index) {
-            <li>
-              <span class="period">{{ job.period }}</span>
-              <h3>{{ job.role }} <span>· {{ jobs[i].company }}</span></h3>
-              <p>{{ job.summary }}</p>
-              <small>{{ jobs[i].stack }}</small>
-            </li>
-          }
-        </ol>
-      </div>
-      <aside class="edu">
-        <h3 class="edu-title">{{ c.experience.educationTitle }}</h3>
-        @for (e of c.experience.education; track e.title) {
-          <article class="edu-card" [class.current]="e.current">
-            @if (e.current) { <span class="badge">{{ c.experience.current }}</span> }
-            <h4>{{ e.title }}</h4>
-            <p>{{ e.place }}</p>
-            <small>{{ e.period }}</small>
-          </article>
-        }
-        <div class="cv-links">
-          <a class="btn btn-ghost" [href]="links.cvEs" download>{{ c.experience.downloadEs }} <span aria-hidden="true">↓</span></a>
-          <a class="btn btn-ghost" [href]="links.cvEn" download>{{ c.experience.downloadEn }} <span aria-hidden="true">↓</span></a>
-        </div>
-      </aside>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="section contact" aria-labelledby="contact-title">
-    <div class="wrap contact-box pixel-frame">
-      <p class="eyebrow blink">{{ c.contact.eyebrow }}</p>
-      <h2 id="contact-title">{{ c.contact.title }}</h2>
-      <p class="section-intro">{{ c.contact.intro }}</p>
-      <a class="btn btn-primary btn-big" [href]="'mailto:' + links.email">✉ {{ c.contact.email }}</a>
-      <p class="email-text">{{ links.email }}</p>
-      <ul class="socials">
-        <li><a [href]="links.itch" target="_blank" rel="noopener noreferrer">{{ c.contact.itch }} ↗</a></li>
-        <li><a [href]="links.linkedin" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>
-        <li><a [href]="links.github" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
-      </ul>
-    </div>
-  </section>
+          </div>
+        </section>
+    }
+  }
 </main>
 
 <footer class="footer">

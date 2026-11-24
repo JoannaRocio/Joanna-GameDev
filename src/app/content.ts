@@ -17,6 +17,8 @@ export interface GameData {
   width?: number;
   height?: number;
   link?: string;
+  /** Vertical phone screenshots, shown side by side instead of `image`. */
+  screens?: string[];
   released: boolean;
   browser: boolean;
   tags: string[];
@@ -65,10 +67,66 @@ export const GAMES: GameData[] = [
   {
     id: 'pompon',
     engine: 'Godot',
+    screens: [
+      '/images/pompon/portada.webp',
+      '/images/pompon/casa.webp',
+      '/images/pompon/aprender-jugando.webp',
+      '/images/pompon/tienda.webp',
+    ],
     released: false,
     browser: false,
     tags: ['Godot', 'Mobile', 'Edu'],
   },
+];
+
+export type SpriteGroup = 'character' | 'enemies' | 'items' | 'world';
+export type SpriteId =
+  | 'rapha-idle' | 'rapha-walk' | 'rapha-jump' | 'rapha-twist'
+  | 'toad-jump' | 'parrot'
+  | 'coin' | 'bubble' | 'heart'
+  | 'platform-grass' | 'platform-cloud' | 'platform-hell' | 'ground-tiles';
+
+export const SPRITES: { group: SpriteGroup; items: { id: SpriteId; src: string; w: number; h: number; frames?: number }[] }[] = [
+  {
+    group: 'character',
+    items: [
+      { id: 'rapha-idle', src: '/art/rapha-idle.webp', w: 240, h: 267, frames: 23 },
+      { id: 'rapha-walk', src: '/art/rapha-walk.webp', w: 147, h: 246, frames: 8 },
+      { id: 'rapha-jump', src: '/art/rapha-jump.webp', w: 156, h: 267, frames: 11 },
+      { id: 'rapha-twist', src: '/art/rapha-twist.webp', w: 189, h: 246, frames: 12 },
+    ],
+  },
+  {
+    group: 'enemies',
+    items: [
+      { id: 'toad-jump', src: '/art/toad-jump.webp', w: 186, h: 135, frames: 13 },
+      { id: 'parrot', src: '/art/parrot.webp', w: 180, h: 111, frames: 16 },
+    ],
+  },
+  {
+    group: 'items',
+    items: [
+      { id: 'coin', src: '/art/coin.webp', w: 120, h: 132, frames: 11 },
+      { id: 'bubble', src: '/art/bubble.png', w: 228, h: 204 },
+      { id: 'heart', src: '/art/heart.png', w: 156, h: 132 },
+    ],
+  },
+  {
+    group: 'world',
+    items: [
+      { id: 'platform-grass', src: '/art/platform-grass.png', w: 180, h: 198 },
+      { id: 'platform-cloud', src: '/art/platform-cloud.png', w: 174, h: 106 },
+      { id: 'platform-hell', src: '/art/platform-hell.png', w: 180, h: 184 },
+      { id: 'ground-tiles', src: '/art/ground-tiles.png', w: 336, h: 258 },
+    ],
+  },
+];
+
+export type TrackId = 'menu' | 'gameplay' | 'sad';
+export const TRACKS: { id: TrackId; src: string; duration: number }[] = [
+  { id: 'menu', src: '/music/main-menu.mp3', duration: 16 },
+  { id: 'gameplay', src: '/music/gameplay.mp3', duration: 34 },
+  { id: 'sad', src: '/music/sad-theme.mp3', duration: 36 },
 ];
 
 export const LINKS = {
@@ -117,6 +175,8 @@ interface GameCopy {
   genre: string;
   description: string;
   imageAlt: string;
+  /** One description per screenshot in `screens`. */
+  screenAlts?: string[];
 }
 
 export interface Copy {
@@ -124,7 +184,7 @@ export interface Copy {
   metaDescription: string;
   skipLink: string;
   langLabel: string;
-  nav: { games: string; about: string; skills: string; experience: string; contact: string };
+  nav: { home: string; games: string; art: string; about: string; skills: string; experience: string; contact: string };
   menu: string;
   hero: {
     eyebrow: string;
@@ -158,8 +218,20 @@ export interface Copy {
     mobile: string;
     play: string;
     soon: string;
-    screenshotSoon: string;
     items: Record<GameId, GameCopy>;
+  };
+  art: {
+    eyebrow: string;
+    title: string;
+    intro: string;
+    groups: Record<SpriteGroup, string>;
+    sprites: Record<SpriteId, string>;
+    frames: string;
+    musicTitle: string;
+    musicIntro: string;
+    tracks: Record<TrackId, string>;
+    play: string;
+    pause: string;
   };
   about: {
     eyebrow: string;
@@ -204,7 +276,7 @@ const es: Copy = {
     'Portfolio de Joanna Rocío Sakugawa, game developer en Buenos Aires. Juegos 2D en Unity y Godot: programación, pixel art, música y sonido.',
   skipLink: 'Saltar al contenido',
   langLabel: 'Idioma',
-  nav: { games: 'Juegos', about: 'Sobre mí', skills: 'Habilidades', experience: 'Experiencia', contact: 'Contacto' },
+  nav: { home: 'Inicio', games: 'Juegos', art: 'Arte y música', about: 'Sobre mí', skills: 'Habilidades', experience: 'Experiencia', contact: 'Contacto' },
   menu: 'Menú',
   hero: {
     eyebrow: 'GAME DEVELOPER · BUENOS AIRES',
@@ -249,7 +321,6 @@ const es: Copy = {
     mobile: 'Celular',
     play: 'Jugar',
     soon: 'Próximamente',
-    screenshotSoon: 'Captura próximamente',
     items: {
       fishing: {
         title: 'Fishing Fish',
@@ -276,9 +347,42 @@ const es: Copy = {
         title: 'Pompon Friends',
         genre: 'Mascota virtual 2D estilo Tamagotchi',
         description: 'Un juego para celular, pensado para chicos, donde cuidan a su mascota virtual y aprenden mientras juegan.',
-        imageAlt: 'Dibujo en pixel art de un pompón sonriente.',
+        imageAlt: 'Capturas de Pompon Friends en el celular.',
+        screenAlts: [
+          'Pantalla de inicio de Pompon Friends con cinco mascotas y el botón ¡Jugar!.',
+          'Mochi, una conejita celeste, en su casa con las barras de hambre, energía y felicidad.',
+          'Minijuego de aprender jugando: un examen de multiplicación con tres respuestas.',
+          'Tienda de muebles y ropa para decorar la casa de la mascota.',
+        ],
       },
     },
+  },
+  art: {
+    eyebrow: 'NIVEL 2 · ARTE Y SONIDO',
+    title: 'Arte y música',
+    intro: 'Estos sprites y temas los hice yo para Rapha vuelve a casa. Dibujé cada animación cuadro por cuadro en pixel art y compuse la música en FL Studio Mobile.',
+    groups: { character: 'Personaje', enemies: 'Enemigos', items: 'Objetos', world: 'Escenario' },
+    sprites: {
+      'rapha-idle': 'Rapha · quieto',
+      'rapha-walk': 'Rapha · caminando',
+      'rapha-jump': 'Rapha · saltando',
+      'rapha-twist': 'Rapha · giro',
+      'toad-jump': 'Sapo',
+      parrot: 'Loro',
+      coin: 'Moneda',
+      bubble: 'Burbuja',
+      heart: 'Vida',
+      'platform-grass': 'Plataforma de pasto',
+      'platform-cloud': 'Plataforma de nubes',
+      'platform-hell': 'Plataforma del infierno',
+      'ground-tiles': 'Tiles de suelo',
+    },
+    frames: 'cuadros',
+    musicTitle: 'Música',
+    musicIntro: 'Temas originales del juego.',
+    tracks: { menu: 'Menú principal', gameplay: 'Gameplay', sad: 'Tema triste' },
+    play: 'Reproducir',
+    pause: 'Pausar',
   },
   about: {
     eyebrow: 'PERFIL DE JUGADORA',
@@ -341,7 +445,7 @@ const en: Copy = {
     'Portfolio of Joanna Rocío Sakugawa, a game developer in Buenos Aires. 2D games in Unity and Godot: programming, pixel art, music and sound.',
   skipLink: 'Skip to content',
   langLabel: 'Language',
-  nav: { games: 'Games', about: 'About', skills: 'Skills', experience: 'Experience', contact: 'Contact' },
+  nav: { home: 'Home', games: 'Games', art: 'Art & music', about: 'About', skills: 'Skills', experience: 'Experience', contact: 'Contact' },
   menu: 'Menu',
   hero: {
     eyebrow: 'GAME DEVELOPER · BUENOS AIRES',
@@ -386,7 +490,6 @@ const en: Copy = {
     mobile: 'Mobile',
     play: 'Play',
     soon: 'Coming soon',
-    screenshotSoon: 'Screenshot coming soon',
     items: {
       fishing: {
         title: 'Fishing Fish',
@@ -412,9 +515,42 @@ const en: Copy = {
         title: 'Pompon Friends',
         genre: 'Tamagotchi-style 2D virtual pet',
         description: 'A mobile game for kids where they look after their virtual pet and learn while they play.',
-        imageAlt: 'Pixel art drawing of a smiling pompom.',
+        imageAlt: 'Pompon Friends phone screenshots.',
+        screenAlts: [
+          'Pompon Friends title screen with five pets and the Play button.',
+          'Mochi, a light-blue bunny, at home with hunger, energy and happiness bars.',
+          'Learn-while-playing minigame: a multiplication quiz with three answers.',
+          'Shop with furniture and clothes to decorate the pet’s home.',
+        ],
       },
     },
+  },
+  art: {
+    eyebrow: 'LEVEL 2 · ART & SOUND',
+    title: 'Art & music',
+    intro: 'I made these sprites and songs for Rapha Goes Home. I drew every animation frame by frame in pixel art and composed the music in FL Studio Mobile.',
+    groups: { character: 'Character', enemies: 'Enemies', items: 'Items', world: 'World' },
+    sprites: {
+      'rapha-idle': 'Rapha · idle',
+      'rapha-walk': 'Rapha · walk',
+      'rapha-jump': 'Rapha · jump',
+      'rapha-twist': 'Rapha · spin',
+      'toad-jump': 'Toad',
+      parrot: 'Parrot',
+      coin: 'Coin',
+      bubble: 'Bubble',
+      heart: 'Life',
+      'platform-grass': 'Grass platform',
+      'platform-cloud': 'Cloud platform',
+      'platform-hell': 'Underworld platform',
+      'ground-tiles': 'Ground tiles',
+    },
+    frames: 'frames',
+    musicTitle: 'Music',
+    musicIntro: 'Original songs from the game.',
+    tracks: { menu: 'Main menu', gameplay: 'Gameplay', sad: 'Sad theme' },
+    play: 'Play',
+    pause: 'Pause',
   },
   about: {
     eyebrow: 'PLAYER PROFILE',
@@ -477,7 +613,7 @@ const ja: Copy = {
     'ブエノスアイレスのゲーム開発者、Joanna Rocío Sakugawaのポートフォリオ。UnityとGodotで2Dゲームを制作。プログラミング、ドット絵、音楽、効果音。',
   skipLink: '本文へスキップ',
   langLabel: '言語',
-  nav: { games: 'ゲーム', about: 'プロフィール', skills: 'スキル', experience: '経歴', contact: '連絡先' },
+  nav: { home: 'ホーム', games: 'ゲーム', art: 'アート・音楽', about: 'プロフィール', skills: 'スキル', experience: '経歴', contact: '連絡先' },
   menu: 'メニュー',
   hero: {
     eyebrow: 'GAME DEVELOPER · BUENOS AIRES',
@@ -522,7 +658,6 @@ const ja: Copy = {
     mobile: 'スマホ',
     play: 'プレイ',
     soon: '近日公開',
-    screenshotSoon: 'スクリーンショット準備中',
     items: {
       fishing: {
         title: 'Fishing Fish',
@@ -548,9 +683,42 @@ const ja: Copy = {
         title: 'Pompon Friends',
         genre: 'たまごっち風の2D育成ゲーム',
         description: '子ども向けのスマホゲーム。バーチャルペットのお世話をしながら、遊びの中で学べます。',
-        imageAlt: '笑顔のポンポンのドット絵。',
+        imageAlt: 'Pompon Friendsのスマホ画面。',
+        screenAlts: [
+          '5匹のペットと「プレイ」ボタンがあるPompon Friendsのタイトル画面。',
+          '空腹・元気・幸せのゲージと一緒に、家にいる水色のウサギのモチ。',
+          '遊びながら学ぶミニゲーム：3つの選択肢があるかけ算クイズ。',
+          'ペットの家を飾る家具や服のショップ。',
+        ],
       },
     },
+  },
+  art: {
+    eyebrow: 'LEVEL 2 · ART & SOUND',
+    title: 'アートと音楽',
+    intro: 'ここにあるスプライトと曲は、Rapha Goes Homeのために私が制作したものです。アニメーションは1コマずつドット絵で描き、音楽はFL Studio Mobileで作曲しました。',
+    groups: { character: 'キャラクター', enemies: '敵', items: 'アイテム', world: 'ステージ' },
+    sprites: {
+      'rapha-idle': 'ラファ · 待機',
+      'rapha-walk': 'ラファ · 歩き',
+      'rapha-jump': 'ラファ · ジャンプ',
+      'rapha-twist': 'ラファ · 回転',
+      'toad-jump': 'カエル',
+      parrot: 'オウム',
+      coin: 'コイン',
+      bubble: '泡',
+      heart: 'ライフ',
+      'platform-grass': '草の足場',
+      'platform-cloud': '雲の足場',
+      'platform-hell': '地獄の足場',
+      'ground-tiles': '地面タイル',
+    },
+    frames: 'コマ',
+    musicTitle: '音楽',
+    musicIntro: 'ゲームのオリジナル曲。',
+    tracks: { menu: 'メインメニュー', gameplay: 'ゲームプレイ', sad: '悲しいテーマ' },
+    play: '再生',
+    pause: '一時停止',
   },
   about: {
     eyebrow: 'PLAYER PROFILE',
