@@ -3,10 +3,10 @@ export type Lang = 'es' | 'en' | 'ja';
 export const LANGS: { id: Lang; label: string; name: string }[] = [
   { id: 'es', label: 'ES', name: 'Español' },
   { id: 'en', label: 'EN', name: 'English' },
-  { id: 'ja', label: 'JA', name: '日本語' },
+  { id: 'ja', label: '日本語', name: '日本語' },
 ];
 
-export type GameId = 'fishing' | 'dona' | 'memo' | 'pompon';
+export type GameId = 'rapha' | 'fishing' | 'dona' | 'memo' | 'pompon';
 export type Engine = 'Unity' | 'Godot';
 
 /** Data that does not change between languages. */
@@ -32,6 +32,17 @@ export const RAPHA = {
 };
 
 export const GAMES: GameData[] = [
+  {
+    id: 'rapha',
+    engine: 'Unity',
+    image: RAPHA.image,
+    width: RAPHA.width,
+    height: RAPHA.height,
+    link: RAPHA.link,
+    released: true,
+    browser: true,
+    tags: ['Unity', 'C#', 'WebGL', 'Pixel art'],
+  },
   {
     id: 'fishing',
     engine: 'Unity',
@@ -177,6 +188,8 @@ interface GameCopy {
   imageAlt: string;
   /** One description per screenshot in `screens`. */
   screenAlts?: string[];
+  badge?: string;
+  credits?: { role: string; detail: string }[];
 }
 
 export interface Copy {
@@ -195,17 +208,6 @@ export interface Copy {
     stats: { value: string; label: string }[];
     pressStart: string;
   };
-  featured: {
-    eyebrow: string;
-    title: string;
-    genre: string;
-    badge: string;
-    description: string;
-    imageAlt: string;
-    creditsTitle: string;
-    credits: { role: string; detail: string }[];
-    play: string;
-  };
   games: {
     eyebrow: string;
     title: string;
@@ -218,6 +220,8 @@ export interface Copy {
     mobile: string;
     play: string;
     soon: string;
+    creditsTitle: string;
+    listLabel: string;
     items: Record<GameId, GameCopy>;
   };
   art: {
@@ -253,6 +257,7 @@ export interface Copy {
   experience: {
     eyebrow: string;
     title: string;
+    jobsTitle: string;
     jobs: { role: string; period: string; summary: string }[];
     educationTitle: string;
     education: { title: string; place: string; period: string; current: boolean }[];
@@ -292,23 +297,6 @@ const es: Copy = {
     ],
     pressStart: 'PRESS START',
   },
-  featured: {
-    eyebrow: 'PROYECTO DESTACADO',
-    title: 'Rapha vuelve a casa',
-    genre: 'Plataformero 2D · Unity · C#',
-    badge: 'Hecho 100% por mí, sin IA',
-    description:
-      'Rapha quiere volver a casa con su familia. Recorrés su mundo esquivando sapos y loros, los atacás con burbujas y juntás monedas hasta llegar a la meta. Hice todo yo: el código, los sprites, la música y los sonidos.',
-    imageAlt: 'Pantalla de inicio de Rapha vuelve a casa: una tortuga con gorra junto al menú del juego.',
-    creditsTitle: 'Créditos',
-    credits: [
-      { role: 'Programación', detail: 'Unity · C#' },
-      { role: 'Arte y animación', detail: 'Pixel art · Piskel · Krita' },
-      { role: 'Música', detail: 'FL Studio Mobile' },
-      { role: 'Efectos de sonido', detail: 'sfxr' },
-    ],
-    play: 'Jugar en itch.io',
-  },
   games: {
     eyebrow: 'NIVEL 1 · PROYECTOS',
     title: 'Mis juegos',
@@ -319,15 +307,31 @@ const es: Copy = {
     inDev: 'En desarrollo',
     browser: 'Navegador',
     mobile: 'Celular',
-    play: 'Jugar',
+    play: 'Jugar en itch.io',
     soon: 'Próximamente',
+    creditsTitle: 'Créditos',
+    listLabel: 'Lista de juegos',
     items: {
+      rapha: {
+        title: 'Rapha vuelve a casa',
+        genre: 'Plataformero 2D',
+        description:
+          'Rapha quiere volver a casa con su familia. Recorrés su mundo esquivando sapos y loros, los atacás con burbujas y juntás monedas hasta llegar a la meta. Hice todo yo: el código, los sprites, la música y los sonidos.',
+        imageAlt: 'Pantalla de inicio de Rapha vuelve a casa: una tortuga con gorra junto al menú del juego.',
+        badge: 'Hecho 100% por mí, sin IA',
+        credits: [
+          { role: 'Programación', detail: 'Unity · C#' },
+          { role: 'Arte y animación', detail: 'Pixel art · Piskel · Krita' },
+          { role: 'Música', detail: 'FL Studio Mobile' },
+          { role: 'Efectos de sonido', detail: 'sfxr' },
+        ],
+      },
       fishing: {
-        title: 'Fishing Fish',
+        title: 'Pez Pescador',
         genre: "Shoot 'em up 2D",
         description:
           'Un pez chiquito armado con burbujas esquiva oleadas de criaturas marinas, cada una con su propio patrón de ataque, hasta enfrentar al jefe final y salvar el arrecife.',
-        imageAlt: 'Captura de Fishing Fish: un pez naranja dispara burbujas a peces enemigos bajo el agua.',
+        imageAlt: 'Captura de Pez Pescador: un pez naranja dispara burbujas a peces enemigos bajo el agua.',
       },
       dona: {
         title: 'El sueño de Dona',
@@ -337,19 +341,19 @@ const es: Copy = {
         imageAlt: 'Pantalla de inicio de El sueño de Dona: una tortuga corredora junto al menú.',
       },
       memo: {
-        title: "Memo's Island",
+        title: 'La isla de Memo',
         genre: 'RPG de aventura 2D con carreras de monstruos, estilo Game Boy',
         description:
           'Una aventura en una isla con su pueblo, un reloj con ciclo de día y noche, y monstruos que compiten en carreras.',
-        imageAlt: "Captura de Memo's Island: un pueblo de noche con faroles, casas y un monstruo junto al personaje.",
+        imageAlt: "Captura de La isla de Memo: un pueblo de noche con faroles, casas y un monstruo junto al personaje.",
       },
       pompon: {
-        title: 'Pompon Friends',
+        title: 'Amigos Pompón',
         genre: 'Mascota virtual 2D estilo Tamagotchi',
         description: 'Un juego para celular, pensado para chicos, donde cuidan a su mascota virtual y aprenden mientras juegan.',
-        imageAlt: 'Capturas de Pompon Friends en el celular.',
+        imageAlt: 'Capturas de Amigos Pompón en el celular.',
         screenAlts: [
-          'Pantalla de inicio de Pompon Friends con cinco mascotas y el botón ¡Jugar!.',
+          'Pantalla de inicio de Amigos Pompón con cinco mascotas y el botón ¡Jugar!.',
           'Mochi, una conejita celeste, en su casa con las barras de hambre, energía y felicidad.',
           'Minijuego de aprender jugando: un examen de multiplicación con tres respuestas.',
           'Tienda de muebles y ropa para decorar la casa de la mascota.',
@@ -420,6 +424,7 @@ const es: Copy = {
       { role: 'Programadora Frontend', period: 'Dic. 2021 – Feb. 2023', summary: 'Aplicación interna, componentes reutilizables y grillas para grandes volúmenes de datos.' },
       { role: 'Programadora Full Stack', period: 'Jul. 2019 – Dic. 2021', summary: 'Aplicaciones web full stack para Bcycle y WarnerMedia.' },
     ],
+    jobsTitle: 'Trabajo',
     educationTitle: 'Educación',
     education: [
       { title: 'Licenciatura en Desarrollo y Producción de Videojuegos', place: 'Universidad de la Ciudad Autónoma de Buenos Aires', period: 'Desde agosto 2026', current: true },
@@ -461,23 +466,6 @@ const en: Copy = {
     ],
     pressStart: 'PRESS START',
   },
-  featured: {
-    eyebrow: 'FEATURED PROJECT',
-    title: 'Rapha Goes Home',
-    genre: '2D platformer · Unity · C#',
-    badge: 'Made 100% by me, no AI',
-    description:
-      'Rapha wants to get back home to the family. You run through Rapha\'s world dodging frogs and parrots, hit them with bubbles and collect coins until you reach the goal. I made everything myself: the code, the sprites, the music and the sounds.',
-    imageAlt: 'Rapha Goes Home title screen: a turtle wearing a cap next to the game menu.',
-    creditsTitle: 'Credits',
-    credits: [
-      { role: 'Programming', detail: 'Unity · C#' },
-      { role: 'Art & animation', detail: 'Pixel art · Piskel · Krita' },
-      { role: 'Music', detail: 'FL Studio Mobile' },
-      { role: 'Sound effects', detail: 'sfxr' },
-    ],
-    play: 'Play on itch.io',
-  },
   games: {
     eyebrow: 'LEVEL 1 · PROJECTS',
     title: 'My games',
@@ -488,9 +476,25 @@ const en: Copy = {
     inDev: 'In development',
     browser: 'Browser',
     mobile: 'Mobile',
-    play: 'Play',
+    play: 'Play on itch.io',
     soon: 'Coming soon',
+    creditsTitle: 'Credits',
+    listLabel: 'Game list',
     items: {
+      rapha: {
+        title: 'Rapha Goes Home',
+        genre: '2D platformer',
+        description:
+          'Rapha wants to get back home to the family. You run through Rapha\'s world dodging frogs and parrots, hit them with bubbles and collect coins until you reach the goal. I made everything myself: the code, the sprites, the music and the sounds.',
+        imageAlt: 'Rapha Goes Home title screen: a turtle wearing a cap next to the game menu.',
+        badge: 'Made 100% by me, no AI',
+        credits: [
+          { role: 'Programming', detail: 'Unity · C#' },
+          { role: 'Art & animation', detail: 'Pixel art · Piskel · Krita' },
+          { role: 'Music', detail: 'FL Studio Mobile' },
+          { role: 'Sound effects', detail: 'sfxr' },
+        ],
+      },
       fishing: {
         title: 'Fishing Fish',
         genre: "2D shoot 'em up",
@@ -588,6 +592,7 @@ const en: Copy = {
       { role: 'Frontend Developer', period: 'Dec. 2021 – Feb. 2023', summary: 'Internal application, reusable components and data grids for large datasets.' },
       { role: 'Full Stack Developer', period: 'Jul. 2019 – Dec. 2021', summary: 'Full stack web applications for Bcycle and WarnerMedia.' },
     ],
+    jobsTitle: 'Work',
     educationTitle: 'Education',
     education: [
       { title: "Bachelor's Degree in Video Game Development and Production", place: 'University of the City of Buenos Aires', period: 'Since August 2026', current: true },
@@ -629,23 +634,6 @@ const ja: Copy = {
     ],
     pressStart: 'PRESS START',
   },
-  featured: {
-    eyebrow: '注目のプロジェクト',
-    title: 'Rapha Goes Home',
-    genre: '2Dプラットフォーマー · Unity · C#',
-    badge: 'AIを使わず、すべて自作',
-    description:
-      'ラファは家族の待つ家に帰りたい。カエルやオウムをよけ、泡で攻撃し、コインを集めながらゴールを目指します。コード、スプライト、音楽、効果音まで、すべて私ひとりで制作しました。',
-    imageAlt: 'Rapha Goes Homeのタイトル画面：帽子をかぶったカメとゲームメニュー。',
-    creditsTitle: 'クレジット',
-    credits: [
-      { role: 'プログラミング', detail: 'Unity · C#' },
-      { role: 'アート・アニメーション', detail: 'ドット絵 · Piskel · Krita' },
-      { role: '音楽', detail: 'FL Studio Mobile' },
-      { role: '効果音', detail: 'sfxr' },
-    ],
-    play: 'itch.ioでプレイ',
-  },
   games: {
     eyebrow: 'LEVEL 1 · PROJECTS',
     title: '制作したゲーム',
@@ -656,36 +644,52 @@ const ja: Copy = {
     inDev: '開発中',
     browser: 'ブラウザ',
     mobile: 'スマホ',
-    play: 'プレイ',
+    play: 'itch.ioでプレイ',
     soon: '近日公開',
+    creditsTitle: 'クレジット',
+    listLabel: 'ゲーム一覧',
     items: {
+      rapha: {
+        title: 'ラファ、おうちへ帰る',
+        genre: '2Dプラットフォーマー',
+        description:
+          'ラファは家族の待つ家に帰りたい。カエルやオウムをよけ、泡で攻撃し、コインを集めながらゴールを目指します。コード、スプライト、音楽、効果音まで、すべて私ひとりで制作しました。',
+        imageAlt: '『ラファ、おうちへ帰る』のタイトル画面：帽子をかぶったカメとゲームメニュー。',
+        badge: 'AIを使わず、すべて自作',
+        credits: [
+          { role: 'プログラミング', detail: 'Unity · C#' },
+          { role: 'アート・アニメーション', detail: 'ドット絵 · Piskel · Krita' },
+          { role: '音楽', detail: 'FL Studio Mobile' },
+          { role: '効果音', detail: 'sfxr' },
+        ],
+      },
       fishing: {
-        title: 'Fishing Fish',
+        title: 'フィッシング・フィッシュ',
         genre: '2Dシューティング',
         description:
           '泡で戦う小さな魚が、それぞれ違う攻撃パターンを持つ海の生き物たちの群れをかわし、ボスを倒してサンゴ礁を守ります。',
-        imageAlt: 'Fishing Fishのスクリーンショット：オレンジの魚が水中で敵の魚に泡を撃っている。',
+        imageAlt: '『フィッシング・フィッシュ』のスクリーンショット：オレンジの魚が水中で敵の魚に泡を撃っている。',
       },
       dona: {
-        title: "Dona's Dream",
+        title: 'ドナの夢',
         genre: 'ローグライク要素のあるランナー型プラットフォーマー',
         description:
           '大事なレースの前夜、ある女の子が走り続けるカメ「ドナ」の夢を見ます。ジャンプして敵をよけ、3枚のスターコインを集め、ボスを倒して時間までに目を覚ましましょう。',
-        imageAlt: "Dona's Dreamのタイトル画面：走るカメとメニュー。",
+        imageAlt: "『ドナの夢』のタイトル画面：走るカメとメニュー。",
       },
       memo: {
-        title: "Memo's Island",
+        title: 'メモの島',
         genre: 'モンスターレースのある2DアドベンチャーRPG（ゲームボーイ風）',
         description: '町のある島を舞台にしたアドベンチャー。昼夜が変わる時計があり、モンスターたちがレースで競い合います。',
-        imageAlt: "Memo's Islandのスクリーンショット：街灯と家が並ぶ夜の町と、プレイヤーのそばのモンスター。",
+        imageAlt: "『メモの島』のスクリーンショット：街灯と家が並ぶ夜の町と、プレイヤーのそばのモンスター。",
       },
       pompon: {
-        title: 'Pompon Friends',
+        title: 'ポンポンフレンズ',
         genre: 'たまごっち風の2D育成ゲーム',
         description: '子ども向けのスマホゲーム。バーチャルペットのお世話をしながら、遊びの中で学べます。',
-        imageAlt: 'Pompon Friendsのスマホ画面。',
+        imageAlt: '『ポンポンフレンズ』のスマホ画面。',
         screenAlts: [
-          '5匹のペットと「プレイ」ボタンがあるPompon Friendsのタイトル画面。',
+          '5匹のペットと「プレイ」ボタンがある『ポンポンフレンズ』のタイトル画面。',
           '空腹・元気・幸せのゲージと一緒に、家にいる水色のウサギのモチ。',
           '遊びながら学ぶミニゲーム：3つの選択肢があるかけ算クイズ。',
           'ペットの家を飾る家具や服のショップ。',
@@ -696,7 +700,7 @@ const ja: Copy = {
   art: {
     eyebrow: 'LEVEL 2 · ART & SOUND',
     title: 'アートと音楽',
-    intro: 'ここにあるスプライトと曲は、Rapha Goes Homeのために私が制作したものです。アニメーションは1コマずつドット絵で描き、音楽はFL Studio Mobileで作曲しました。',
+    intro: 'ここにあるスプライトと曲は、『ラファ、おうちへ帰る』のために私が制作したものです。アニメーションは1コマずつドット絵で描き、音楽はFL Studio Mobileで作曲しました。',
     groups: { character: 'キャラクター', enemies: '敵', items: 'アイテム', world: 'ステージ' },
     sprites: {
       'rapha-idle': 'ラファ · 待機',
@@ -756,6 +760,7 @@ const ja: Copy = {
       { role: 'フロントエンドエンジニア', period: '2021年12月 – 2023年2月', summary: '社内アプリ、再利用可能なコンポーネント、大量データ用のグリッド。' },
       { role: 'フルスタックエンジニア', period: '2019年7月 – 2021年12月', summary: 'BcycleとWarnerMedia向けのフルスタックWebアプリ。' },
     ],
+    jobsTitle: '職歴',
     educationTitle: '学歴',
     education: [
       { title: 'ビデオゲーム開発・制作 学士課程', place: 'ブエノスアイレス市立大学', period: '2026年8月から', current: true },

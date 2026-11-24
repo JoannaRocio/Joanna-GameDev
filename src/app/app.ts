@@ -5,6 +5,7 @@ import {
   COPY,
   GAMES,
   GameData,
+  GameId,
   JOBS,
   LANGS,
   LINKS,
@@ -12,12 +13,14 @@ import {
   PIPELINE_TOOLS,
   RAPHA,
   SPRITES,
+  SpriteGroup,
   TRACKS,
   TrackId,
   WEB_SKILLS,
 } from './content';
 
 type Filter = 'all' | 'unity' | 'godot' | 'playable';
+type ExpTab = 'jobs' | 'education';
 type TabId = 'inicio' | 'juegos' | 'arte' | 'sobre-mi' | 'habilidades' | 'experiencia' | 'contacto';
 type NavKey = 'home' | 'games' | 'art' | 'about' | 'skills' | 'experience' | 'contact';
 
@@ -80,6 +83,15 @@ export class App {
   protected readonly filters: Filter[] = ['all', 'unity', 'godot', 'playable'];
 
   protected readonly visibleGames = computed(() => GAMES.filter((g) => matches(g, this.filter())));
+  private readonly selectedId = signal<GameId>(GAMES[0].id);
+  /** The open game; falls back to the first one the filter shows. */
+  protected readonly selectedGame = computed(() => {
+    const visible = this.visibleGames();
+    return visible.find((g) => g.id === this.selectedId()) ?? visible[0];
+  });
+  protected readonly artGroup = signal<SpriteGroup>(SPRITES[0].group);
+  protected readonly currentSprites = computed(() => SPRITES.find((g) => g.group === this.artGroup())!.items);
+  protected readonly expTab = signal<ExpTab>('jobs');
   protected readonly counts = Object.fromEntries(
     (['all', 'unity', 'godot', 'playable'] as Filter[]).map((f) => [f, GAMES.filter((g) => matches(g, f)).length]),
   ) as Record<Filter, number>;
@@ -115,6 +127,28 @@ export class App {
 
   protected setFilter(filter: Filter): void {
     this.filter.set(filter);
+  }
+
+  protected selectGame(id: GameId): void {
+    this.selectedId.set(id);
+  }
+
+  /** Arrow keys move between tabs of a tab list, as screen-reader users expect. */
+  protected onTabKeydown(event: KeyboardEvent): void {
+    const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+    const list = (event.currentTarget as HTMLElement).querySelectorAll<HTMLElement>('[role="tab"]');
+    const tabs = Array.from(list);
+    const i = tabs.indexOf(event.target as HTMLElement);
+    if (i < 0) return;
+    event.preventDefault();
+    const next =
+      event.key === 'Home' ? 0
+      : event.key === 'End' ? tabs.length - 1
+      : event.key === 'ArrowDown' || event.key === 'ArrowRight' ? (i + 1) % tabs.length
+      : (i - 1 + tabs.length) % tabs.length;
+    tabs[next].focus();
+    tabs[next].click();
   }
 
   protected toggleTrack(id: TrackId): void {

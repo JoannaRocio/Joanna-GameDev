@@ -7,6 +7,17 @@
       <span class="brand-mark" aria-hidden="true">JS</span>
       <span class="brand-name">Joanna Sakugawa</span>
     </a>
+    <nav class="tabbar" [attr.aria-label]="c.menu">
+      <ul class="tabs">
+        @for (t of tabs; track t.id) {
+          <li>
+            <a class="tab" [href]="'#' + t.id" [class.active]="activeTab() === t.id" [attr.aria-current]="activeTab() === t.id ? 'page' : null">
+              <span class="tab-icon" aria-hidden="true">{{ t.icon }}</span>{{ c.nav[t.key] }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
     <div class="lang-switch" role="group" [attr.aria-label]="c.langLabel">
       @for (l of langs; track l.id) {
         <button type="button" [attr.lang]="l.id" [attr.title]="l.name" [attr.aria-pressed]="language() === l.id" (click)="setLanguage(l.id)">
@@ -15,20 +26,9 @@
       }
     </div>
   </div>
-  <nav class="tabbar" [attr.aria-label]="c.menu">
-    <ul class="wrap tabs">
-      @for (t of tabs; track t.id) {
-        <li>
-          <a class="tab" [href]="'#' + t.id" [class.active]="activeTab() === t.id" [attr.aria-current]="activeTab() === t.id ? 'page' : null">
-            <span class="tab-icon" aria-hidden="true">{{ t.icon }}</span>{{ c.nav[t.key] }}
-          </a>
-        </li>
-      }
-    </ul>
-  </nav>
 </header>
 
-<main id="main" class="tab-panel">
+<main id="main" class="tab-panel" [attr.data-tab]="activeTab()">
   @switch (activeTab()) {
     @case ('inicio') {
       <!-- HERO -->
@@ -65,87 +65,83 @@
           </div>
         </section>
 
-      <!-- FEATURED -->
-        <section class="featured" aria-labelledby="featured-title">
-          <div class="wrap featured-grid">
-            <a class="featured-media pixel-frame" [href]="rapha.link" target="_blank" rel="noopener noreferrer">
-              <img [src]="rapha.image" [alt]="c.featured.imageAlt" [width]="rapha.width" [height]="rapha.height" loading="lazy" />
-              <span class="badge badge-gold">★ {{ c.featured.badge }}</span>
-            </a>
-            <div class="featured-copy">
-              <p class="eyebrow">{{ c.featured.eyebrow }}</p>
-              <h2 id="featured-title">{{ c.featured.title }}</h2>
-              <p class="genre">{{ c.featured.genre }}</p>
-              <p>{{ c.featured.description }}</p>
-              <h3 class="credits-title">{{ c.featured.creditsTitle }}</h3>
-              <ul class="credits">
-                @for (cr of c.featured.credits; track cr.role) {
-                  <li><span>{{ cr.role }}</span><span class="dots" aria-hidden="true"></span><strong>Joanna</strong><small>{{ cr.detail }}</small></li>
-                }
-              </ul>
-              <a class="btn btn-primary" [href]="rapha.link" target="_blank" rel="noopener noreferrer">▶ {{ c.featured.play }}</a>
-            </div>
-          </div>
-        </section>
     }
     @case ('juegos') {
-      <!-- GAMES -->
-        <section class="section" aria-labelledby="games-title">
-          <div class="wrap">
-            <header class="section-head">
-              <div>
-                <p class="eyebrow">{{ c.games.eyebrow }}</p>
-                <h2 id="games-title">{{ c.games.title }}</h2>
-                <p class="section-intro">{{ c.games.intro }}</p>
-              </div>
-              <div class="filters" role="group" [attr.aria-label]="c.games.filtersLabel">
-                @for (f of filters; track f) {
-                  <button type="button" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
-                    {{ c.games.filters[f] }} <span class="count">{{ counts[f] }}</span>
-                  </button>
-                }
-              </div>
-            </header>
-
-            <ul class="game-grid">
-              @for (g of visibleGames(); track g.id) {
-                @let gc = c.games.items[g.id];
-                <li class="game-card">
-                  <div class="game-media">
-                    @if (g.screens) {
-                      <div class="phone-strip">
-                        @for (src of g.screens; track src; let i = $index) {
-                          <img [src]="src" [alt]="gc.screenAlts?.[i] ?? ''" width="540" height="960" loading="lazy" />
-                        }
-                      </div>
-                    } @else if (g.image) {
-                      <img [src]="g.image" [alt]="gc.imageAlt" [width]="g.width" [height]="g.height" loading="lazy" />
-                    }
-                    <span class="engine engine-{{ g.engine.toLowerCase() }}">{{ g.engine }}</span>
-                  </div>
-                  <div class="game-body">
-                    <div class="game-status">
-                      <span class="status" [class.live]="g.released">{{ g.released ? c.games.released : c.games.inDev }}</span>
-                      @if (g.browser) { <span class="platform">{{ c.games.browser }}</span> }
-                      @if (g.id === 'pompon') { <span class="platform">{{ c.games.mobile }}</span> }
-                    </div>
-                    <h3>{{ gc.title }}</h3>
-                    <p class="genre">{{ gc.genre }}</p>
-                    <p class="game-desc">{{ gc.description }}</p>
-                    <ul class="tags">
-                      @for (t of g.tags; track t) { <li>{{ t }}</li> }
-                    </ul>
-                    @if (g.link) {
-                      <a class="btn btn-small" [href]="g.link" target="_blank" rel="noopener noreferrer">▶ {{ c.games.play }} <span class="sr-only">{{ gc.title }}</span></a>
-                    } @else {
-                      <span class="btn btn-small btn-disabled">{{ c.games.soon }}</span>
-                    }
-                  </div>
-                </li>
+      <section class="section games" aria-labelledby="games-title">
+        <div class="wrap games-layout">
+          <div class="games-side">
+            <p class="eyebrow">{{ c.games.eyebrow }}</p>
+            <h2 id="games-title">{{ c.games.title }}</h2>
+            <div class="filters" role="group" [attr.aria-label]="c.games.filtersLabel">
+              @for (f of filters; track f) {
+                <button type="button" [attr.aria-pressed]="filter() === f" (click)="setFilter(f)">
+                  {{ c.games.filters[f] }} <span class="count">{{ counts[f] }}</span>
+                </button>
               }
-            </ul>
+            </div>
+            <div class="game-list" role="tablist" aria-orientation="vertical" [attr.aria-label]="c.games.listLabel" (keydown)="onTabKeydown($event)">
+              @for (g of visibleGames(); track g.id) {
+                @let selected = selectedGame().id === g.id;
+                <button type="button" role="tab" class="game-tab" [id]="'game-tab-' + g.id"
+                  aria-controls="game-panel" [attr.aria-selected]="selected" [attr.tabindex]="selected ? 0 : -1"
+                  (click)="selectGame(g.id)">
+                  <span class="game-thumb" [class.phone]="g.screens">
+                    <img [src]="g.screens ? g.screens[0] : g.image" alt="" width="64" height="36" />
+                  </span>
+                  <span class="game-tab-text">
+                    <strong>{{ c.games.items[g.id].title }}</strong>
+                    <small>{{ g.engine }} · {{ g.released ? c.games.released : c.games.inDev }}</small>
+                  </span>
+                </button>
+              }
+            </div>
           </div>
-        </section>
+
+          @let g = selectedGame();
+          @let gc = c.games.items[g.id];
+          <article id="game-panel" class="game-detail" role="tabpanel" [attr.aria-labelledby]="'game-tab-' + g.id">
+            <div class="game-media" [class.is-phone]="g.screens" [style.--shot]="g.image ? 'url(' + g.image + ')' : null">
+              @if (g.screens) {
+                <div class="phone-strip">
+                  @for (src of g.screens; track src; let i = $index) {
+                    <a [href]="src" target="_blank" rel="noopener"><img [src]="src" [alt]="gc.screenAlts?.[i] ?? ''" width="540" height="960" /></a>
+                  }
+                </div>
+              } @else {
+                <img [src]="g.image" [alt]="gc.imageAlt" [width]="g.width" [height]="g.height" />
+              }
+              <span class="engine engine-{{ g.engine.toLowerCase() }}">{{ g.engine }}</span>
+              @if (gc.badge) { <span class="badge badge-gold">★ {{ gc.badge }}</span> }
+            </div>
+            <div class="game-body">
+              <div class="game-status">
+                <span class="status" [class.live]="g.released">{{ g.released ? c.games.released : c.games.inDev }}</span>
+                @if (g.browser) { <span class="platform">{{ c.games.browser }}</span> }
+                @if (g.screens) { <span class="platform">{{ c.games.mobile }}</span> }
+              </div>
+              <h3>{{ gc.title }}</h3>
+              <p class="genre">{{ gc.genre }}</p>
+              <p class="game-desc">{{ gc.description }}</p>
+              @if (gc.credits) {
+                <h4 class="credits-title">{{ c.games.creditsTitle }}</h4>
+                <ul class="credits">
+                  @for (cr of gc.credits; track cr.role) {
+                    <li><span>{{ cr.role }}</span><span class="dots" aria-hidden="true"></span><small>{{ cr.detail }}</small></li>
+                  }
+                </ul>
+              }
+              <ul class="tags">
+                @for (t of g.tags; track t) { <li>{{ t }}</li> }
+              </ul>
+              @if (g.link) {
+                <a class="btn btn-small" [href]="g.link" target="_blank" rel="noopener noreferrer">▶ {{ c.games.play }} <span class="sr-only">{{ gc.title }}</span></a>
+              } @else {
+                <span class="btn btn-small btn-disabled">{{ c.games.soon }}</span>
+              }
+            </div>
+          </article>
+        </div>
+      </section>
     }
     @case ('arte') {
       <section class="section" aria-labelledby="art-title">
@@ -160,22 +156,26 @@
 
           <div class="art-layout">
             <div class="sprite-groups">
-              @for (g of spriteGroups; track g.group) {
-                <section class="sprite-group" [attr.aria-label]="c.art.groups[g.group]">
-                  <h3>{{ c.art.groups[g.group] }}</h3>
-                  <ul class="sprite-grid">
-                    @for (sp of g.items; track sp.id) {
-                      <li class="sprite-cell">
-                        <div class="sprite-stage">
-                          <img [src]="sp.src" [alt]="c.art.sprites[sp.id]" [width]="sp.w" [height]="sp.h" loading="lazy" />
-                        </div>
-                        <span class="sprite-name">{{ c.art.sprites[sp.id] }}</span>
-                        @if (sp.frames) { <span class="sprite-frames">{{ sp.frames }} {{ c.art.frames }}</span> }
-                      </li>
-                    }
-                  </ul>
-                </section>
-              }
+              <div class="subtabs" role="tablist" [attr.aria-label]="c.art.title" (keydown)="onTabKeydown($event)">
+                @for (g of spriteGroups; track g.group) {
+                  <button type="button" role="tab" [id]="'art-tab-' + g.group" aria-controls="art-panel"
+                    [attr.aria-selected]="artGroup() === g.group" [attr.tabindex]="artGroup() === g.group ? 0 : -1"
+                    (click)="artGroup.set(g.group)">
+                    {{ c.art.groups[g.group] }} <span class="count">{{ g.items.length }}</span>
+                  </button>
+                }
+              </div>
+              <ul id="art-panel" class="sprite-grid" role="tabpanel" [attr.aria-labelledby]="'art-tab-' + artGroup()">
+                @for (sp of currentSprites(); track sp.id) {
+                  <li class="sprite-cell">
+                    <div class="sprite-stage">
+                      <img [src]="sp.src" [alt]="c.art.sprites[sp.id]" [width]="sp.w" [height]="sp.h" />
+                    </div>
+                    <span class="sprite-name">{{ c.art.sprites[sp.id] }}</span>
+                    @if (sp.frames) { <span class="sprite-frames">{{ sp.frames }} {{ c.art.frames }}</span> }
+                  </li>
+                }
+              </ul>
             </div>
 
             <aside class="music-player pixel-frame" aria-labelledby="music-title">
@@ -259,12 +259,26 @@
         </section>
     }
     @case ('experiencia') {
-      <!-- EXPERIENCE -->
-        <section class="section section-alt" aria-labelledby="experience-title">
-          <div class="wrap exp-grid">
+      <section class="section section-alt" aria-labelledby="experience-title">
+        <div class="wrap">
+          <header class="section-head">
             <div>
               <p class="eyebrow">{{ c.experience.eyebrow }}</p>
               <h2 id="experience-title">{{ c.experience.title }}</h2>
+            </div>
+            <div class="subtabs" role="tablist" [attr.aria-label]="c.experience.title" (keydown)="onTabKeydown($event)">
+              <button type="button" role="tab" id="exp-tab-jobs" aria-controls="exp-panel"
+                [attr.aria-selected]="expTab() === 'jobs'" [attr.tabindex]="expTab() === 'jobs' ? 0 : -1" (click)="expTab.set('jobs')">
+                {{ c.experience.jobsTitle }} <span class="count">{{ jobs.length }}</span>
+              </button>
+              <button type="button" role="tab" id="exp-tab-education" aria-controls="exp-panel"
+                [attr.aria-selected]="expTab() === 'education'" [attr.tabindex]="expTab() === 'education' ? 0 : -1" (click)="expTab.set('education')">
+                {{ c.experience.educationTitle }} <span class="count">{{ c.experience.education.length }}</span>
+              </button>
+            </div>
+          </header>
+          <div id="exp-panel" role="tabpanel" [attr.aria-labelledby]="'exp-tab-' + expTab()">
+            @if (expTab() === 'jobs') {
               <ol class="timeline">
                 @for (job of c.experience.jobs; track $index; let i = $index) {
                   <li>
@@ -275,24 +289,25 @@
                   </li>
                 }
               </ol>
-            </div>
-            <aside class="edu">
-              <h3 class="edu-title">{{ c.experience.educationTitle }}</h3>
-              @for (e of c.experience.education; track e.title) {
-                <article class="edu-card" [class.current]="e.current">
-                  @if (e.current) { <span class="badge">{{ c.experience.current }}</span> }
-                  <h4>{{ e.title }}</h4>
-                  <p>{{ e.place }}</p>
-                  <small>{{ e.period }}</small>
-                </article>
-              }
+            } @else {
+              <div class="edu">
+                @for (e of c.experience.education; track e.title) {
+                  <article class="edu-card" [class.current]="e.current">
+                    @if (e.current) { <span class="badge">{{ c.experience.current }}</span> }
+                    <h3>{{ e.title }}</h3>
+                    <p>{{ e.place }}</p>
+                    <small>{{ e.period }}</small>
+                  </article>
+                }
+              </div>
               <div class="cv-links">
                 <a class="btn btn-ghost" [href]="links.cvEs" download>{{ c.experience.downloadEs }} <span aria-hidden="true">↓</span></a>
                 <a class="btn btn-ghost" [href]="links.cvEn" download>{{ c.experience.downloadEn }} <span aria-hidden="true">↓</span></a>
               </div>
-            </aside>
+            }
           </div>
-        </section>
+        </div>
+      </section>
     }
     @case ('contacto') {
       <!-- CONTACT -->
